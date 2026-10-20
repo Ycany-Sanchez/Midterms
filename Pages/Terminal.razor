@@ -251,7 +251,7 @@
 
                         <!-- Execute Breach -->
                         <button type="button" @onclick="SubmitCurrentGuess" disabled="@(GameState.ActiveGame.IsGameOver || currentInput.Length != GameState.ActiveGame.CodeLength)"
-                                class="keypad-btn h-11 sm:h-12 rounded-xl bg-gradient-to-r from-rose-600 via-red-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-mono text-xs sm:text-sm font-extrabold flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(244,63,94,0.4)] card-lift disabled:opacity-40 disabled:pointer-events-none"
+                                class="keypad-btn h-11 sm:h-12 rounded-xl bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-mono text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:pointer-events-none"
                                 title="Submit Guess (Enter)">
                             <i class="fa-solid fa-arrow-turn-down fa-rotate-90"></i>
                             <span>ENTER</span>
@@ -525,7 +525,7 @@
                 <!-- Flow CTA Buttons -->
                 <div class="space-y-2.5">
                     <a href="signup"
-                       class="w-full py-3.5 rounded-xl font-mono text-sm font-bold bg-gradient-to-r from-rose-600 via-red-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-[0_0_20px_rgba(244,63,94,0.45)] transition card-lift flex items-center justify-center gap-2">
+                       class="w-full py-3.5 rounded-xl font-mono text-sm font-bold bg-rose-600 hover:bg-rose-500 text-white transition card-lift flex items-center justify-center gap-2">
                         <i class="fa-solid fa-user-plus"></i>
                         <span>Register Agent Profile</span>
                     </a>
@@ -626,7 +626,7 @@
 
                     <!-- Dismiss Button -->
                     <button type="button" @onclick="DismissBriefing"
-                            class="w-full py-3.5 rounded-xl font-mono text-sm font-bold bg-gradient-to-r from-rose-600 via-red-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-lg transition-all duration-200 card-lift flex items-center justify-center gap-2">
+                            class="w-full py-3.5 rounded-xl font-mono text-sm font-bold bg-rose-600 hover:bg-rose-500 text-white transition-all duration-150 card-lift flex items-center justify-center gap-2">
                         <i class="fa-solid fa-check"></i>
                         <span>Got It, Start Playing</span>
                     </button>

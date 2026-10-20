@@ -2,65 +2,56 @@
 @inject NavigationManager Navigation
 @implements IDisposable
 
-<header class="sticky top-0 z-50 w-full border-b border-rose-500/20 bg-black/75 backdrop-blur-xl">
+<header class="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#0c0f16]">
     <div class="max-w-[1550px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <!-- Brand / Logo -->
         <NavLink href="" class="flex items-center gap-3 group">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/25 via-red-600/20 to-amber-500/15 border border-rose-500/50 flex items-center justify-center text-rose-400 group-hover:border-rose-400 group-hover:shadow-[0_0_20px_rgba(244,63,94,0.6)] transition duration-300">
-                <i class="fa-solid fa-shield-halved text-lg"></i>
+            <div class="w-9 h-9 rounded-lg bg-rose-500/15 border border-rose-500/40 flex items-center justify-center text-rose-400">
+                <i class="fa-solid fa-vault text-base"></i>
             </div>
             <div>
-                <span class="font-display font-bold text-lg tracking-wider text-white flex items-center gap-1.5">
+                <span class="font-display font-bold text-lg tracking-tight text-white flex items-center gap-1.5">
                     VAULT<span class="text-rose-500">CODE</span>
-                    <span class="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-300 border border-rose-500/40">REDLINE</span>
                 </span>
-                <p class="text-[10px] text-rose-300/60 font-mono tracking-tight hidden sm:block">CODE BREAKER MINIGAME</p>
+                <p class="text-[10px] text-slate-400 font-mono tracking-tight hidden sm:block">Code Breaker Minigame</p>
             </div>
         </NavLink>
 
-        <!-- Navigation Sequence: Home -> Login -> Terminal -> Recruit -->
-        <nav class="flex items-center gap-1 sm:gap-2">
-            <!-- Step 1: Home -->
-            <NavLink href="" Match="NavLinkMatch.All" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5" ActiveClass="text-rose-400 bg-rose-500/15 border border-rose-500/40 font-bold">
-                <span class="text-[10px] text-rose-400/80 font-mono font-bold">1.</span>
-                <span>Home</span>
+        <!-- Navigation Sequence -->
+        <nav class="flex items-center gap-1 sm:gap-2 font-mono text-xs">
+            <NavLink href="" Match="NavLinkMatch.All" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition" ActiveClass="text-white bg-white/10 border border-white/10 font-bold">
+                Home
             </NavLink>
 
-            <!-- Step 2: Login -->
-            <NavLink href="login" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5" ActiveClass="text-rose-400 bg-rose-500/15 border border-rose-500/40 font-bold">
-                <span class="text-[10px] text-rose-400/80 font-mono font-bold">2.</span>
-                <span>Sign In</span>
+            <NavLink href="login" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition" ActiveClass="text-white bg-white/10 border border-white/10 font-bold">
+                Sign In
             </NavLink>
 
-            <!-- Step 3: Terminal -->
-            <NavLink href="terminal" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5" ActiveClass="text-rose-400 bg-rose-500/15 border border-rose-500/40 font-bold">
-                <span class="text-[10px] text-rose-400/80 font-mono font-bold">3.</span>
-                <span>Terminal</span>
+            <NavLink href="terminal" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition" ActiveClass="text-white bg-white/10 border border-white/10 font-bold">
+                Terminal
             </NavLink>
 
-            <!-- Step 4: Recruit -->
-            <NavLink href="signup" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 transition flex items-center gap-1.5" ActiveClass="text-rose-400 bg-rose-500/15 border border-rose-500/40 font-bold">
-                <span class="text-[10px] text-rose-400/80 font-mono font-bold">4.</span>
-                <span>Recruit</span>
+            <NavLink href="signup" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition" ActiveClass="text-white bg-white/10 border border-white/10 font-bold">
+                Recruit
             </NavLink>
         </nav>
 
         <!-- Right Side: Active Agent Clearance & Primary CTA -->
         <div class="flex items-center gap-3">
-            <div class="hidden lg:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-black/60 border border-rose-500/20">
-                <div class="w-7 h-7 rounded-lg bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 text-xs">
+            <div class="hidden lg:flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-[#141924] border border-white/[0.08]">
+                <div class="w-6 h-6 rounded-md bg-rose-500/20 text-rose-400 flex items-center justify-center text-xs">
                     <i class="fa-solid @GameState.CurrentAgent.AvatarIcon"></i>
                 </div>
-                <div class="text-left">
-                    <p class="text-xs font-semibold text-white tracking-wide leading-none font-mono">@GameState.CurrentAgent.Codename</p>
-                    <span class="text-[10px] text-rose-400/80 font-mono">
+                <div class="text-left font-mono">
+                    <p class="text-xs font-semibold text-white leading-none">@GameState.CurrentAgent.Codename</p>
+                    <span class="text-[10px] text-slate-400">
                         @(GameState.CurrentAgent.ClearanceLevel == ClearanceLevel.Mastermind ? "Mastermind" : "Operative")
                     </span>
                 </div>
             </div>
 
             <!-- Red CTA Button -->
-            <NavLink href="terminal" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-500 hover:to-red-600 text-white font-mono tracking-wider shadow-[0_0_18px_rgba(244,63,94,0.45)] transition card-lift flex items-center gap-1.5">
+            <NavLink href="terminal" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white font-mono tracking-wider transition card-lift flex items-center gap-1.5">
                 <i class="fa-solid fa-play text-[11px]"></i>
                 <span class="hidden sm:inline">PLAY</span>
             </NavLink>

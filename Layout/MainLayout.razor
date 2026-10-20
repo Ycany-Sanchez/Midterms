@@ -1,15 +1,7 @@
 @inherits LayoutComponentBase
 
-<div class="relative min-h-screen text-slate-100 flex flex-col selection:bg-rose-600 selection:text-white">
-    <!-- Ambient Cyberpunk Crimson Background -->
-    <div class="cyber-bg">
-        <div class="cyber-grid"></div>
-        <div class="cyber-orb-red"></div>
-        <div class="cyber-orb-ruby"></div>
-        <div class="cyber-orb-amber"></div>
-    </div>
-
-    <!-- Top Navigation Bar (Follows Home -> Sign In -> Terminal -> Recruit) -->
+<div class="relative min-h-screen text-slate-100 flex flex-col bg-[#090b10] selection:bg-rose-600 selection:text-white">
+    <!-- Top Navigation Bar -->
     <CyberNav />
 
     <!-- Main Content View -->
@@ -18,7 +10,7 @@
     </main>
 
     <!-- Global Clean Footer -->
-    <footer class="relative z-10 border-t border-rose-500/15 bg-black/60 backdrop-blur-md py-5 text-center text-xs text-slate-400 font-mono">
+    <footer class="relative z-10 border-t border-white/[0.08] bg-[#0c0f16] py-5 text-center text-xs text-slate-400 font-mono">
         <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-2 text-slate-400">
                 <i class="fa-solid fa-terminal text-rose-500"></i>
