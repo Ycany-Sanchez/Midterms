@@ -1,0 +1,18 @@
+## .NET & Build Artifacts
+bin/
+obj/
+*.user
+*.userosscache
+*.suo
+.vs/
+.vscode/
+.idea/
+*.swp
+*~
+
+## OS generated
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store

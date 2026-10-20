@@ -1,0 +1,466 @@
+/* ==========================================================================
+   VAULTCODE — Cyberpunk Crimson Glassmorphism Design System
+   ========================================================================== */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+:root {
+    --color-obsidian: #080205;
+    --color-crimson-deep: #16040a;
+    --color-crimson-glow: #ef4444;
+    --color-ruby-glow: #b91c1c;
+    --color-emerald-code: #10b981;
+    --color-amber-code: #f59e0b;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-obsidian);
+    color: #f1f5f9;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+/* Headings font */
+h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* Monospace font for digital readouts */
+.font-mono-cyber {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    letter-spacing: 0.1em;
+}
+
+/* ==========================================================================
+   Ambient Atmosphere & Grid System (Cyber Crimson)
+   ========================================================================== */
+.cyber-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(circle at 50% 0%, #2b0813 0%, #120308 55%, #050103 100%);
+    overflow: hidden;
+}
+
+/* Dot Grid Pattern Overlay */
+.cyber-grid {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(244, 63, 94, 0.12) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.75;
+    mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 90%);
+    -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 90%);
+}
+
+/* Ambient Radial Glow Orbs in Crimson & Ruby */
+.cyber-orb-red {
+    position: absolute;
+    top: -10%;
+    left: 15%;
+    width: 650px;
+    height: 650px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.22) 0%, rgba(239, 68, 68, 0.04) 50%, transparent 70%);
+    filter: blur(65px);
+    pointer-events: none;
+    animation: orbFloat 16s ease-in-out infinite alternate;
+}
+
+.cyber-orb-ruby {
+    position: absolute;
+    top: 25%;
+    right: 10%;
+    width: 700px;
+    height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(185, 28, 28, 0.2) 0%, rgba(185, 28, 28, 0.04) 50%, transparent 70%);
+    filter: blur(75px);
+    pointer-events: none;
+    animation: orbFloat 20s ease-in-out infinite alternate-reverse;
+}
+
+.cyber-orb-amber {
+    position: absolute;
+    bottom: 5%;
+    left: 30%;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 60%);
+    filter: blur(80px);
+    pointer-events: none;
+}
+
+@keyframes orbFloat {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(40px, -30px) scale(1.08); }
+    100% { transform: translate(-30px, 40px) scale(0.95); }
+}
+
+/* ==========================================================================
+   Glassmorphic Surfaces
+   ========================================================================== */
+.glass-card {
+    background: rgba(22, 5, 12, 0.62);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(244, 63, 94, 0.18);
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-card-accent {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(28, 6, 15, 0.75) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(244, 63, 94, 0.22);
+    border-radius: 1.25rem;
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+}
+
+.glass-input {
+    background: rgba(18, 4, 10, 0.75);
+    border: 1px solid rgba(244, 63, 94, 0.25);
+    color: #f8fafc;
+    transition: all 0.2s ease;
+}
+
+.glass-input:focus {
+    outline: none;
+    border-color: rgba(239, 68, 68, 0.7);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2), 0 0 18px rgba(239, 68, 68, 0.3);
+}
+
+/* ==========================================================================
+   Code Tile Visual States (Cyberpunk Color Coding)
+   ========================================================================== */
+.tile-base {
+    width: 3.25rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: 0.75rem;
+    border-width: 2px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+}
+
+@media (min-width: 640px) {
+    .tile-base {
+        width: 3.65rem;
+        height: 3.9rem;
+        font-size: 1.65rem;
+    }
+}
+
+/* Emerald: Correct digit, correct position */
+.tile-correct {
+    background-color: rgba(16, 185, 129, 0.25);
+    color: #6ee7b7;
+    border-color: rgba(16, 185, 129, 0.6);
+    box-shadow: 0 0 20px -3px rgba(16, 185, 129, 0.4), inset 0 1px 1px rgba(110, 231, 183, 0.3);
+}
+
+/* Amber: Digit exists in code, wrong position */
+.tile-misplaced {
+    background-color: rgba(245, 158, 11, 0.25);
+    color: #fcd34d;
+    border-color: rgba(245, 158, 11, 0.6);
+    box-shadow: 0 0 20px -3px rgba(245, 158, 11, 0.4), inset 0 1px 1px rgba(252, 211, 77, 0.3);
+}
+
+/* Slate/Muted: Digit not in passcode */
+.tile-wrong {
+    background-color: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.28);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Active typing slot in Crimson */
+.tile-typing {
+    background-color: rgba(239, 68, 68, 0.16);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.7);
+    box-shadow: 0 0 16px -2px rgba(239, 68, 68, 0.4);
+    transform: scale(1.03);
+}
+
+/* Empty pending slot */
+.tile-empty {
+    background-color: rgba(20, 4, 10, 0.55);
+    color: #4b1222;
+    border-color: rgba(244, 63, 94, 0.15);
+}
+
+/* ==========================================================================
+   Keyframe Animations & Motion
+   ========================================================================== */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes floatAnim {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes glowPulse {
+    0%, 100% {
+        box-shadow: 0 0 18px -2px rgba(239, 68, 68, 0.4), 0 0 6px -2px rgba(185, 28, 28, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 30px 3px rgba(239, 68, 68, 0.7), 0 0 14px 2px rgba(244, 63, 94, 0.5);
+    }
+}
+
+@keyframes tilePop {
+    0% { transform: scale(0.92); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+
+@keyframes dangerPulse {
+    0%, 100% {
+        box-shadow: inset 0 0 35px rgba(239, 68, 68, 0.25), 0 0 20px rgba(239, 68, 68, 0.35);
+        border-color: rgba(239, 68, 68, 0.6);
+    }
+    50% {
+        box-shadow: inset 0 0 70px rgba(239, 68, 68, 0.5), 0 0 40px rgba(239, 68, 68, 0.7);
+        border-color: rgba(239, 68, 68, 1);
+    }
+}
+
+.anim-fade-up {
+    animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.anim-fade-left {
+    animation: fadeInLeft 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.anim-fade-right {
+    animation: fadeInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.anim-float {
+    animation: floatAnim 4.5s ease-in-out infinite;
+}
+
+.anim-glow {
+    animation: glowPulse 3s ease-in-out infinite;
+}
+
+.anim-tile-pop {
+    animation: tilePop 0.16s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.anim-shake {
+    animation: shake 0.35s ease-in-out both;
+}
+
+.anim-danger-pulse {
+    animation: dangerPulse 1s ease-in-out infinite;
+}
+
+/* Stagger Delay Classes */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
+
+/* Interactive Card Lift */
+.card-lift {
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease;
+}
+
+.card-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.7), 0 0 25px -5px rgba(239, 68, 68, 0.3);
+}
+
+.keypad-btn {
+    transition: all 0.12s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.keypad-btn:active {
+    transform: scale(0.94);
+}
+
+/* ==========================================================================
+   Custom Scrollbar (Crimson Accent)
+   ========================================================================== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0d0206;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3f0d19;
+    border-radius: 9999px;
+    border: 2px solid #0d0206;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6b1429;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #3f0d19 #0d0206;
+}
+
+/* ==========================================================================
+   Dark Boot / WASM Loading Screen
+   ========================================================================== */
+.app-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: radial-gradient(circle at 50% 40%, #1a040b 0%, #060103 100%);
+    color: #f8fafc;
+    user-select: none;
+}
+
+.spinner-ring {
+    position: relative;
+    width: 68px;
+    height: 68px;
+}
+
+.spinner-ring div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 56px;
+    height: 56px;
+    margin: 6px;
+    border: 3px solid transparent;
+    border-radius: 50%;
+    animation: spinner-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #ef4444 transparent transparent transparent;
+}
+
+.spinner-ring div:nth-child(1) { animation-delay: -0.45s; }
+.spinner-ring div:nth-child(2) { animation-delay: -0.3s; }
+.spinner-ring div:nth-child(3) { animation-delay: -0.15s; }
+
+@keyframes spinner-ring {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-progress-bar {
+    width: 220px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    overflow: hidden;
+    margin-top: 1.5rem;
+}
+
+.loading-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ef4444, #f59e0b);
+    width: var(--blazor-load-percentage, 10%);
+    transition: width 0.15s ease-out;
+}
+
+.loading-status-text::after {
+    content: var(--blazor-load-percentage-text, "INITIALIZING REDLINE VAULT PROTOCOL...");
+}
+
+/* ==========================================================================
+   Blazor Error UI
+   ========================================================================== */
+#blazor-error-ui {
+    background: rgba(28, 6, 12, 0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(239, 68, 68, 0.5);
+    color: #fca5a5;
+    bottom: 0;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.7);
+    display: none;
+    left: 0;
+    padding: 0.9rem 1.75rem;
+    position: fixed;
+    width: 100%;
+    z-index: 10000;
+    font-size: 0.875rem;
+}
+
+#blazor-error-ui a {
+    color: #f87171;
+    text-decoration: underline;
+    margin-left: 0.5rem;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #fda4af;
+    font-size: 1.2rem;
+}

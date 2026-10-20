@@ -1,0 +1,34 @@
+@inherits LayoutComponentBase
+
+<div class="relative min-h-screen text-slate-100 flex flex-col selection:bg-rose-600 selection:text-white">
+    <!-- Ambient Cyberpunk Crimson Background -->
+    <div class="cyber-bg">
+        <div class="cyber-grid"></div>
+        <div class="cyber-orb-red"></div>
+        <div class="cyber-orb-ruby"></div>
+        <div class="cyber-orb-amber"></div>
+    </div>
+
+    <!-- Top Navigation Bar (Follows Home -> Sign In -> Terminal -> Recruit) -->
+    <CyberNav />
+
+    <!-- Main Content View -->
+    <main class="relative z-10 flex-1 flex flex-col">
+        @Body
+    </main>
+
+    <!-- Global Cyberpunk Footer -->
+    <footer class="relative z-10 border-t border-rose-500/15 bg-black/60 backdrop-blur-md py-5 text-center text-xs text-slate-400 font-mono">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2 text-slate-400">
+                <i class="fa-solid fa-terminal text-rose-500"></i>
+                <span class="tracking-wide">VAULTCODE // REDLINE PENETRATION PROTOCOL</span>
+            </div>
+            <div class="flex items-center gap-4 text-slate-400">
+                <span class="text-rose-400 font-bold">CIRCUIT: HOME &rarr; AUTH &rarr; TERMINAL &rarr; RECRUIT</span>
+                <span>•</span>
+                <span class="text-rose-500"><i class="fa-solid fa-circle text-[8px] animate-pulse"></i> GRID ALERT LEVEL 5</span>
+            </div>
+        </div>
+    </footer>
+</div>
