@@ -2,32 +2,24 @@
 @inject GameStateService GameState
 @inject NavigationManager Navigation
 
-<PageTitle>Sign In — VaultCode Step 2: Authentication</PageTitle>
+<PageTitle>Sign In — VaultCode</PageTitle>
 
 <div class="min-h-[calc(100vh-8rem)] flex items-center justify-center px-4 py-12">
     <div class="w-full max-w-lg glass-card-accent p-6 sm:p-10 space-y-7 anim-fade-up border border-rose-500/25">
         
-        <!-- Mission Phase Indicator -->
-        <div class="flex items-center justify-between text-xs font-mono border-b border-rose-500/20 pb-3">
-            <span class="text-rose-400 font-bold flex items-center gap-1.5">
-                <i class="fa-solid fa-key"></i> PHASE 2 // AGENT AUTHENTICATION
-            </span>
-            <span class="text-slate-500">NEXT: TERMINAL</span>
-        </div>
-
         <!-- Header -->
         <div class="text-center space-y-2">
             <div class="w-14 h-14 mx-auto rounded-2xl bg-rose-500/15 border border-rose-500/40 flex items-center justify-center text-rose-400 text-2xl shadow-[0_0_20px_rgba(244,63,94,0.35)] anim-float">
-                <i class="fa-solid fa-fingerprint"></i>
+                <i class="fa-solid fa-user-astronaut"></i>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-bold font-display text-white">Agent Clearance Sign-In</h1>
-            <p class="text-xs sm:text-sm text-slate-400">Identify codename & select operation clearance before cracking the vault.</p>
+            <h1 class="text-2xl sm:text-3xl font-bold font-display text-white">Agent Sign-In</h1>
+            <p class="text-xs sm:text-sm text-slate-400">Enter your codename and choose your difficulty level to begin.</p>
         </div>
 
-        <!-- Clearance Selection Tabs (Red / Amber) -->
+        <!-- Clearance Selection Tabs (Operative / Mastermind) -->
         <div class="space-y-3">
             <label class="block text-xs font-mono uppercase tracking-wider text-slate-300">
-                <i class="fa-solid fa-sliders text-rose-400 mr-1.5"></i>Select Mission Clearance
+                <i class="fa-solid fa-sliders text-rose-400 mr-1.5"></i>Select Difficulty Tier
             </label>
             <div class="grid grid-cols-2 gap-3">
                 <!-- Operative Mode Tab -->
@@ -35,10 +27,10 @@
                         class="p-4 rounded-xl text-left border transition-all duration-200 card-lift @(selectedClearance == ClearanceLevel.Operative ? "bg-rose-500/20 border-rose-400 text-white shadow-[0_0_15px_rgba(244,63,94,0.4)]" : "bg-black/50 border-white/10 text-slate-400 hover:border-white/20")">
                     <div class="flex items-center justify-between mb-2">
                         <i class="fa-solid fa-shield text-lg @(selectedClearance == ClearanceLevel.Operative ? "text-rose-400" : "text-slate-500")"></i>
-                        <span class="text-[10px] font-mono px-1.5 py-0.5 rounded @(selectedClearance == ClearanceLevel.Operative ? "bg-rose-500/25 text-rose-300" : "bg-white/5 text-slate-500")">4 DIGITS // 30s</span>
+                        <span class="text-[10px] font-mono px-1.5 py-0.5 rounded @(selectedClearance == ClearanceLevel.Operative ? "bg-rose-500/25 text-rose-300" : "bg-white/5 text-slate-500")">4 DIGITS · 45s</span>
                     </div>
                     <div class="text-sm font-bold font-display">Operative</div>
-                    <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Casual vault penetration</div>
+                    <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Standard 4-digit code</div>
                 </button>
 
                 <!-- Mastermind Mode Tab -->
@@ -46,10 +38,10 @@
                         class="p-4 rounded-xl text-left border transition-all duration-200 card-lift @(selectedClearance == ClearanceLevel.Mastermind ? "bg-amber-500/20 border-amber-400 text-white shadow-[0_0_15px_rgba(245,158,11,0.4)]" : "bg-black/50 border-white/10 text-slate-400 hover:border-white/20")">
                     <div class="flex items-center justify-between mb-2">
                         <i class="fa-solid fa-skull text-lg @(selectedClearance == ClearanceLevel.Mastermind ? "text-amber-400" : "text-slate-500")"></i>
-                        <span class="text-[10px] font-mono px-1.5 py-0.5 rounded @(selectedClearance == ClearanceLevel.Mastermind ? "bg-amber-500/25 text-amber-300" : "bg-white/5 text-slate-500")">5 DIGITS // 20s</span>
+                        <span class="text-[10px] font-mono px-1.5 py-0.5 rounded @(selectedClearance == ClearanceLevel.Mastermind ? "bg-amber-500/25 text-amber-300" : "bg-white/5 text-slate-500")">5 DIGITS · 30s Hard</span>
                     </div>
                     <div class="text-sm font-bold font-display">Mastermind</div>
-                    <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Strict high-density code</div>
+                    <div class="text-[11px] text-slate-400 leading-tight mt-0.5">High-speed 5-digit code</div>
                 </button>
             </div>
         </div>
@@ -59,27 +51,13 @@
             <!-- Codename Field -->
             <div class="space-y-1.5">
                 <label class="block text-xs font-mono uppercase tracking-wider text-slate-300">
-                    <i class="fa-solid fa-terminal text-rose-400 mr-1.5"></i>Infiltrator Codename
+                    <i class="fa-solid fa-signature text-rose-400 mr-1.5"></i>Agent Codename
                 </label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 text-sm">
-                        <i class="fa-solid fa-user-secret"></i>
+                        <i class="fa-solid fa-user"></i>
                     </div>
-                    <input type="text" @bind="loginModel.Codename" placeholder="e.g. RedZero_09"
-                           class="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-sm font-mono placeholder:text-slate-600" />
-                </div>
-            </div>
-
-            <!-- Neural Passkey / Password Field -->
-            <div class="space-y-1.5">
-                <label class="block text-xs font-mono uppercase tracking-wider text-slate-300">
-                    <i class="fa-solid fa-lock text-rose-400 mr-1.5"></i>Neural Passkey
-                </label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500 text-sm">
-                        <i class="fa-solid fa-key"></i>
-                    </div>
-                    <input type="password" @bind="loginModel.Passkey" placeholder="••••••••••••"
+                    <input type="text" @bind="loginModel.Codename" placeholder="e.g. Cipher_99"
                            class="w-full pl-10 pr-4 py-3 rounded-xl glass-input text-sm font-mono placeholder:text-slate-600" />
                 </div>
             </div>
@@ -88,50 +66,28 @@
             @if (!string.IsNullOrEmpty(errorMessage))
             {
                 <div class="p-3 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2 anim-fade-up">
-                    <i class="fa-solid fa-triangle-exclamation text-sm"></i>
+                    <i class="fa-solid fa-circle-exclamation text-sm"></i>
                     <span>@errorMessage</span>
                 </div>
             }
 
-            <!-- Terminal Status Banner if Loading -->
-            @if (isLoading)
-            {
-                <div class="p-3.5 rounded-xl bg-black/60 border border-rose-500/40 text-rose-300 text-xs font-mono space-y-1.5 anim-fade-up">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-circle-notch fa-spin text-rose-400"></i>
-                        <span class="font-bold">@terminalLog</span>
-                    </div>
-                    <div class="w-full bg-slate-900 rounded-full h-1 overflow-hidden">
-                        <div class="bg-gradient-to-r from-rose-500 to-amber-500 h-1 animate-pulse" style="width: 85%;"></div>
-                    </div>
-                </div>
-            }
-
-            <!-- Submit Button: Directs to Terminal (Step 3) -->
-            <button type="submit" disabled="@isLoading"
-                    class="w-full py-3.5 rounded-xl font-mono text-sm font-bold bg-gradient-to-r from-rose-600 via-red-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-[0_0_20px_rgba(244,63,94,0.4)] transition-all duration-200 card-lift flex items-center justify-center gap-2 disabled:opacity-50">
-                @if (isLoading)
-                {
-                    <i class="fa-solid fa-spinner fa-spin"></i>
-                    <span>AUTHENTICATING NODE...</span>
-                }
-                else
-                {
-                    <i class="fa-solid fa-terminal"></i>
-                    <span>AUTHENTICATE & ENTER TERMINAL (STEP 3)</span>
-                }
+            <!-- Submit Button: Directs to Terminal -->
+            <button type="submit"
+                    class="w-full py-3.5 rounded-xl font-mono text-sm font-bold bg-gradient-to-r from-rose-600 via-red-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-[0_0_20px_rgba(244,63,94,0.4)] transition-all duration-200 card-lift flex items-center justify-center gap-2">
+                <i class="fa-solid fa-terminal"></i>
+                <span>LAUNCH TERMINAL</span>
             </button>
         </EditForm>
 
         <!-- Footer Alternative Actions -->
         <div class="pt-2 border-t border-rose-500/20 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-3">
             <button type="button" @onclick="HandleQuickGuest" class="text-rose-400 hover:text-rose-300 transition font-mono flex items-center gap-1.5">
-                <i class="fa-solid fa-ghost text-[11px]"></i>
-                <span>Fast Guest Infiltration (Bypass)</span>
+                <i class="fa-solid fa-user-ninja text-[11px]"></i>
+                <span>Quick Play as Guest</span>
             </button>
 
             <a href="signup" class="text-slate-400 hover:text-white transition flex items-center gap-1.5">
-                <span>Skip to Step 4: Recruit</span>
+                <span>Customize Full Profile</span>
                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
             </a>
         </div>
@@ -142,8 +98,6 @@
     private ClearanceLevel selectedClearance = ClearanceLevel.Operative;
     private LoginDto loginModel = new();
     private string errorMessage = string.Empty;
-    private bool isLoading = false;
-    private string terminalLog = "INITIALIZING HANDSHAKE...";
 
     protected override void OnInitialized()
     {
@@ -151,24 +105,15 @@
         selectedClearance = GameState.CurrentAgent.ClearanceLevel;
     }
 
-    private async Task HandleLogin()
+    private void HandleLogin()
     {
         errorMessage = string.Empty;
 
         if (string.IsNullOrWhiteSpace(loginModel.Codename) || loginModel.Codename.Trim().Length < 3)
         {
-            errorMessage = "Hacker codename must contain at least 3 characters.";
+            errorMessage = "Agent codename must contain at least 3 characters.";
             return;
         }
-
-        isLoading = true;
-        terminalLog = "CONNECTING TO SECURE MAINFRAME...";
-        StateHasChanged();
-        await Task.Delay(350);
-
-        terminalLog = $"ACTIVATING {selectedClearance.ToString().ToUpper()} REDLINE PROTOCOL...";
-        StateHasChanged();
-        await Task.Delay(350);
 
         GameState.UpdateAgent(
             loginModel.Codename.Trim(),
@@ -182,7 +127,7 @@
     private void HandleQuickGuest()
     {
         GameState.UpdateAgent(
-            "Ghost_Operative",
+            "Guest_Agent",
             ClearanceLevel.Operative,
             "fa-user-ninja"
         );
@@ -191,7 +136,6 @@
 
     public class LoginDto
     {
-        public string Codename { get; set; } = "RedGhost_09";
-        public string Passkey { get; set; } = "RedlineCyber2099";
+        public string Codename { get; set; } = "Cipher_99";
     }
 }

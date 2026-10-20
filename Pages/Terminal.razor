@@ -4,84 +4,73 @@
 @inject IJSRuntime JS
 @implements IDisposable
 
-<PageTitle>Vault Terminal — VaultCode Redline Incursion</PageTitle>
+<PageTitle>Vault Terminal — VaultCode</PageTitle>
 
-<!-- Subtle CRT monitor scanline overlay -->
-<div class="crt-overlay"></div>
-
-<!-- Focusable wrapper to capture physical keyboard strokes, optimized width without excessive side space -->
-<div class="max-w-[1550px] mx-auto px-2 sm:px-4 lg:px-6 py-4 space-y-4 outline-none relative z-10" tabindex="0" @onkeydown="HandleKeyDown">
+<!-- Focusable wrapper to capture physical keyboard strokes -->
+<div class="max-w-[1500px] mx-auto px-3 sm:px-5 lg:px-6 py-4 space-y-4 outline-none relative z-10" tabindex="0" @onkeydown="HandleKeyDown">
     
     <!-- TOP BREACH COMMAND BAR -->
     <header class="glass-card p-3 sm:p-4 relative overflow-hidden transition-all duration-300 @(secondsRemaining <= 10 && !GameState.ActiveGame.IsGameOver ? "anim-danger-pulse border-rose-500/80" : "border-rose-500/20")">
-        <!-- Background urgent scanner stripe -->
-        <div class="absolute inset-0 bg-gradient-to-r @(secondsRemaining <= 10 && !GameState.ActiveGame.IsGameOver ? "from-rose-500/15 via-red-600/10 to-transparent" : "from-rose-600/5 via-transparent to-amber-600/5") pointer-events-none"></div>
-
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3">
             
-            <!-- Left: Phase Step, Status Badge & Clearance Tiers -->
+            <!-- Left: Status & Mode Switcher -->
             <div class="flex flex-wrap items-center gap-2.5">
-                <!-- Step 3 indicator -->
-                <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold">
-                    PHASE 3 // INVASION
-                </span>
-
                 @if (GameState.ActiveGame.IsSolved)
                 {
-                    <div class="px-3 py-1 rounded-xl bg-emerald-500/20 border border-emerald-400 text-emerald-300 font-mono text-xs font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.5)] animate-pulse">
+                    <div class="px-3 py-1 rounded-xl bg-emerald-500/20 border border-emerald-400 text-emerald-300 font-mono text-xs font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.5)]">
                         <i class="fa-solid fa-unlock-keyhole text-emerald-400"></i>
-                        <span>ACCESS GRANTED</span>
+                        <span>VAULT UNLOCKED</span>
                     </div>
                 }
                 else if (GameState.ActiveGame.IsGameOver)
                 {
-                    <div class="px-3 py-1 rounded-xl bg-rose-500/25 border border-rose-500 text-rose-300 font-mono text-xs font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(244,63,94,0.5)]">
-                        <i class="fa-solid fa-triangle-exclamation text-rose-400"></i>
-                        <span>SYSTEM LOCKOUT</span>
+                    <div class="px-3 py-1 rounded-xl bg-rose-500/25 border border-rose-500 text-rose-300 font-mono text-xs font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-lock text-rose-400"></i>
+                        <span>LOCKOUT</span>
                     </div>
                 }
                 else
                 {
                     <div class="px-2.5 py-1 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 font-mono text-xs font-semibold flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full @(secondsRemaining <= 10 ? "bg-rose-500 animate-ping" : "bg-rose-400 animate-pulse")"></span>
-                        <span>@(secondsRemaining <= 10 ? "CRITICAL ICE DETECTED" : "BREACH IN PROGRESS")</span>
+                        <span class="w-2 h-2 rounded-full @(secondsRemaining <= 10 ? "bg-rose-500 animate-ping" : "bg-rose-400")"></span>
+                        <span>@(secondsRemaining <= 10 ? "Time Critical" : "In Progress")</span>
                     </div>
                 }
 
                 <!-- Clearance Mode Selector -->
                 <div class="flex items-center gap-1 bg-black/60 p-1 rounded-xl border border-rose-500/25 text-xs font-mono">
                     <button type="button" @onclick="() => SwitchClearance(ClearanceLevel.Operative)"
-                            class="px-2 py-0.5 rounded-lg transition-all @(GameState.ActiveGame.ClearanceLevel == ClearanceLevel.Operative ? "bg-rose-500/25 text-rose-300 border border-rose-400/50 font-bold shadow-[0_0_10px_rgba(244,63,94,0.3)]" : "text-slate-400 hover:text-white")">
-                        Operative (4-Digit // 45s Easy)
+                            class="px-2.5 py-1 rounded-lg transition-all @(GameState.ActiveGame.ClearanceLevel == ClearanceLevel.Operative ? "bg-rose-500/25 text-rose-300 border border-rose-400/50 font-bold" : "text-slate-400 hover:text-white")">
+                        Operative (4 Digits · 45s)
                     </button>
                     <button type="button" @onclick="() => SwitchClearance(ClearanceLevel.Mastermind)"
-                            class="px-2 py-0.5 rounded-lg transition-all @(GameState.ActiveGame.ClearanceLevel == ClearanceLevel.Mastermind ? "bg-amber-500/25 text-amber-300 border border-amber-400/50 font-bold shadow-[0_0_10px_rgba(245,158,11,0.3)]" : "text-slate-400 hover:text-white")">
-                        Mastermind (5-Digit // 30s Hard)
+                            class="px-2.5 py-1 rounded-lg transition-all @(GameState.ActiveGame.ClearanceLevel == ClearanceLevel.Mastermind ? "bg-amber-500/25 text-amber-300 border border-amber-400/50 font-bold" : "text-slate-400 hover:text-white")">
+                        Mastermind (5 Digits · 30s Hard)
                     </button>
                 </div>
             </div>
 
-            <!-- Center: High-Urgency Countdown & Trace Bar with Penalty Alert -->
+            <!-- Center: Countdown Clock & Progress Bar -->
             <div class="flex items-center gap-4">
                 <div class="text-right">
-                    <div class="text-[9px] font-mono tracking-widest uppercase @(secondsRemaining <= 10 && !GameState.ActiveGame.IsGameOver ? "text-rose-400 font-bold animate-pulse" : "text-slate-400")">
-                        @(secondsRemaining <= 10 && !GameState.ActiveGame.IsGameOver ? "LOCKOUT IMMINENT" : "TRACE COUNTDOWN")
+                    <div class="text-[10px] font-mono tracking-wider uppercase text-slate-400">
+                        @(secondsRemaining <= 10 && !GameState.ActiveGame.IsGameOver ? "Hurry" : "Time Remaining")
                     </div>
-                    <div class="text-2xl sm:text-3xl font-mono font-extrabold tracking-tight @(secondsRemaining <= 10 && !GameState.ActiveGame.IsGameOver ? "text-rose-400 drop-shadow-[0_0_15px_rgba(244,63,94,0.9)]" : "text-rose-300 drop-shadow-[0_0_10px_rgba(244,63,94,0.4)]")">
+                    <div class="text-2xl sm:text-3xl font-mono font-extrabold tracking-tight @(secondsRemaining <= 10 && !GameState.ActiveGame.IsGameOver ? "text-rose-400" : "text-rose-300")">
                         00:@(secondsRemaining < 10 ? $"0{secondsRemaining}" : secondsRemaining.ToString())
                     </div>
                 </div>
 
-                <!-- Trace Threat Bar -->
-                <div class="w-32 sm:w-44 space-y-1">
+                <!-- Threat Bar -->
+                <div class="w-32 sm:w-40 space-y-1">
                     <div class="flex justify-between text-[10px] font-mono">
-                        <span class="text-slate-400">Trace:</span>
-                        <span class="font-bold @(tracePercent >= 70 ? "text-rose-400 animate-pulse" : tracePercent >= 40 ? "text-amber-400" : "text-rose-300")">
+                        <span class="text-slate-400">Elapsed:</span>
+                        <span class="font-bold @(tracePercent >= 70 ? "text-rose-400" : tracePercent >= 40 ? "text-amber-400" : "text-rose-300")">
                             @tracePercent%
                         </span>
                     </div>
                     <div class="w-full h-2 rounded-full bg-black/60 border border-rose-500/20 overflow-hidden">
-                        <div class="h-full transition-all duration-700 @(tracePercent >= 70 ? "bg-gradient-to-r from-amber-500 to-rose-600 shadow-[0_0_10px_rgba(244,63,94,0.8)]" : "bg-gradient-to-r from-red-600 to-rose-500")"
+                        <div class="h-full transition-all duration-700 @(tracePercent >= 70 ? "bg-gradient-to-r from-amber-500 to-rose-600" : "bg-gradient-to-r from-red-600 to-rose-500")"
                              style="width: @(tracePercent)%;"></div>
                     </div>
                 </div>
@@ -89,27 +78,26 @@
 
             <!-- Right: Controls -->
             <div class="flex items-center gap-2">
-                <!-- Penalty Alert Pill if triggered -->
                 @if (penaltyFlash)
                 {
-                    <span class="px-2 py-1 rounded bg-rose-500 text-white font-mono font-extrabold text-[11px] animate-bounce shadow-[0_0_15px_rgba(244,63,94,0.9)]">
-                        -3s PENALTY!
+                    <span class="px-2 py-1 rounded bg-rose-500 text-white font-mono font-extrabold text-[11px] animate-bounce">
+                        -3s Penalty
                     </span>
                 }
 
                 <!-- Audio SFX Toggle -->
                 <button type="button" @onclick="ToggleAudio"
                         class="px-2.5 py-1.5 rounded-xl border transition-all text-xs font-mono flex items-center gap-1.5 @(audioEnabled ? "bg-rose-500/20 border-rose-500/40 text-rose-300" : "bg-white/5 border-white/10 text-slate-500")"
-                        title="Toggle Synthetic Cyber Sound FX">
+                        title="Toggle Sound Effects">
                     <i class="fa-solid @(audioEnabled ? "fa-volume-high" : "fa-volume-xmark")"></i>
-                    <span class="hidden sm:inline">@(audioEnabled ? "SFX" : "MUTED")</span>
+                    <span class="hidden sm:inline">@(audioEnabled ? "Sound On" : "Muted")</span>
                 </button>
 
                 <!-- Reboot Button -->
                 <button type="button" @onclick="() => StartFreshVault()"
                         class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-500 hover:to-red-600 text-white font-mono text-xs font-bold transition shadow-[0_0_15px_rgba(244,63,94,0.35)] card-lift flex items-center gap-1.5">
                     <i class="fa-solid fa-arrows-rotate"></i>
-                    <span>REBOOT</span>
+                    <span>New Game</span>
                 </button>
             </div>
         </div>
@@ -118,20 +106,20 @@
     <!-- MAIN COCKPIT: TWO-COLUMN TACTICAL DECK -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         
-        <!-- LEFT 7 COLS: DECRYPTION CORE (Matrix & Keypad directly together, no scrolling!) -->
+        <!-- LEFT 7 COLS: DECRYPTION CORE (Matrix & Keypad) -->
         <div class="lg:col-span-7 space-y-4">
             <div class="glass-card-accent p-4 sm:p-5 space-y-4 relative overflow-hidden border-rose-500/25 @(isShaking ? "anim-shake border-rose-500/80" : "")">
                 
                 <!-- Matrix Header Bar -->
                 <div class="flex items-center justify-between border-b border-rose-500/20 pb-2.5 text-xs font-mono">
                     <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-terminal text-rose-400"></i>
-                        <span class="text-white font-bold tracking-wider">REDLINE CIPHER MATRIX</span>
+                        <i class="fa-solid fa-table-cells text-rose-400"></i>
+                        <span class="text-white font-bold tracking-wider">Vault Code Matrix</span>
                     </div>
 
                     <!-- Attempts Cycle Tracker with 6 visual pips -->
                     <div class="flex items-center gap-2">
-                        <span class="text-slate-400 text-[11px]">Cycle:</span>
+                        <span class="text-slate-400 text-[11px]">Attempt:</span>
                         <span class="font-bold text-white px-2 py-0.5 rounded bg-white/5 border border-rose-500/20">
                             @(Math.Min(GameState.ActiveGame.Attempts.Count + 1, GameState.ActiveGame.MaxAttempts)) / @GameState.ActiveGame.MaxAttempts
                         </span>
@@ -140,13 +128,13 @@
                             {
                                 var isUsed = p < GameState.ActiveGame.Attempts.Count;
                                 var isCurrent = p == GameState.ActiveGame.Attempts.Count && !GameState.ActiveGame.IsGameOver;
-                                <span class="w-2.5 h-2.5 rounded-full border transition-all duration-300 @(isUsed ? "bg-rose-500 border-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.7)]" : isCurrent ? "bg-amber-400 border-amber-300 animate-pulse" : "bg-black/60 border-rose-500/30")"></span>
+                                <span class="w-2.5 h-2.5 rounded-full border transition-all duration-300 @(isUsed ? "bg-rose-500 border-rose-400" : isCurrent ? "bg-amber-400 border-amber-300" : "bg-black/60 border-rose-500/30")"></span>
                             }
                         </div>
                     </div>
                 </div>
 
-                <!-- 6-ROW VAULT MATRIX (With Wordle-style 3D flip animation!) -->
+                <!-- 6-ROW VAULT MATRIX (With Wordle-style 3D flip animation) -->
                 <div class="flex flex-col items-center space-y-2 py-1">
                     @for (int rowIndex = 0; rowIndex < GameState.ActiveGame.MaxAttempts; rowIndex++)
                     {
@@ -156,7 +144,7 @@
                         var isLatestEvaluated = rowIndex == GameState.ActiveGame.Attempts.Count - 1;
 
                         <div class="flex items-center gap-2 sm:gap-3">
-                            <!-- Clean Row Number Tag without awkward wrapping -->
+                            <!-- Clean Row Number Tag -->
                             <span class="w-8 font-mono text-xs font-bold select-none text-right @(isActiveRow ? "text-rose-400" : isEvaluatedRow ? "text-slate-400" : "text-rose-950")">
                                 0@(rowIndex + 1)
                             </span>
@@ -186,7 +174,7 @@
                                     var digitChar = hasChar ? currentInput[colIndex] : ' ';
                                     var isNextTarget = currentInput.Length == colIndex;
 
-                                    <div class="tile-base @(hasChar ? "tile-typing anim-tile-pop" : isNextTarget ? "tile-empty border-rose-500/50 shadow-[0_0_12px_rgba(244,63,94,0.3)] animate-pulse" : "tile-empty") font-mono">
+                                    <div class="tile-base @(hasChar ? "tile-typing anim-tile-pop" : isNextTarget ? "tile-empty border-rose-500/50 animate-pulse" : "tile-empty") font-mono">
                                         @digitChar
                                     </div>
                                 }
@@ -221,16 +209,16 @@
                 @if (!string.IsNullOrEmpty(statusFeedback))
                 {
                     <div class="p-2 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-mono text-center flex items-center justify-center gap-2 anim-fade-up">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <i class="fa-solid fa-circle-exclamation"></i>
                         <span>@statusFeedback</span>
                     </div>
                 }
 
-                <!-- INTEGRATED QUANTUM KEYPAD WITH REAL-TIME DIGIT INTEL -->
+                <!-- INTEGRATED KEYPAD -->
                 <div class="pt-2 border-t border-rose-500/20 space-y-2.5">
                     <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 px-1">
-                        <span><i class="fa-solid fa-keyboard mr-1.5 text-rose-400"></i>TACTICAL KEYPAD // INTEL ENABLED</span>
-                        <span class="text-slate-500">Keyboard entry: [0-9], [Del], [Enter]</span>
+                        <span><i class="fa-solid fa-keyboard mr-1.5 text-rose-400"></i>Keypad</span>
+                        <span class="text-slate-500">Keyboard shortcuts: [0-9], [Del], [Enter]</span>
                     </div>
 
                     <div class="grid grid-cols-3 gap-2 sm:gap-2.5 max-w-sm mx-auto">
@@ -252,7 +240,7 @@
                             <span>DEL</span>
                         </button>
 
-                        <!-- Digit 0 with Intel -->
+                        <!-- Digit 0 -->
                         @{
                             var zeroIntelClass = GetKeypadIntelClass('0');
                         }
@@ -266,14 +254,14 @@
                                 class="keypad-btn h-11 sm:h-12 rounded-xl bg-gradient-to-r from-rose-600 via-red-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-mono text-xs sm:text-sm font-extrabold flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(244,63,94,0.4)] card-lift disabled:opacity-40 disabled:pointer-events-none"
                                 title="Submit Guess (Enter)">
                             <i class="fa-solid fa-arrow-turn-down fa-rotate-90"></i>
-                            <span>EXEC</span>
+                            <span>ENTER</span>
                         </button>
                     </div>
 
-                    <!-- REAL-TIME DIGIT ELIMINATION TELEMETRY STRIP -->
+                    <!-- REAL-TIME DIGIT TRACKING STRIP -->
                     <div class="p-2 rounded-xl bg-black/60 border border-rose-500/15 flex items-center justify-between text-[10px] font-mono">
                         <span class="text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                            <i class="fa-solid fa-microchip text-rose-400"></i> DIGIT INTEL:
+                            <i class="fa-solid fa-barcode text-rose-400"></i> Tested Digits:
                         </span>
                         <div class="flex items-center gap-1 sm:gap-1.5">
                             @for (char d = '0'; d <= '9'; d++)
@@ -299,57 +287,54 @@
             </div>
         </div>
 
-        <!-- RIGHT 5 COLS: TACTICAL TELEMETRY & STATS HUD -->
+        <!-- RIGHT 5 COLS: CLEAN GAME STATS & DOSSIER -->
         <div class="lg:col-span-5 space-y-4">
             
-            <!-- LIVE TRACE THREAT TELEMETRY -->
+            <!-- CLEAN RULES & ROUND SUMMARY CARD -->
             <div class="glass-card p-4 sm:p-5 space-y-3 border-rose-500/25">
                 <div class="flex items-center justify-between text-xs font-mono">
                     <span class="text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="fa-solid fa-radar text-rose-400"></i> HOSTILE TRACE TELEMETRY
+                        <i class="fa-solid fa-circle-info text-rose-400"></i> Game Rules
                     </span>
-                    <span class="text-[10px] px-2 py-0.5 rounded font-mono font-bold @(secondsRemaining <= 10 ? "bg-rose-500/25 text-rose-300 animate-pulse border border-rose-500/50" : "bg-white/5 text-slate-400")">
-                        @(secondsRemaining <= 10 ? "THREAT: CRITICAL" : secondsRemaining <= 18 ? "THREAT: ELEVATED" : "THREAT: SAFE")
+                    <span class="text-[10px] text-slate-400 font-mono">
+                        6 Attempts Max
                     </span>
                 </div>
 
-                <!-- Telemetry 2-Grid -->
                 <div class="grid grid-cols-2 gap-2 text-[11px] font-mono">
                     <div class="p-2.5 rounded-lg bg-black/60 border border-rose-500/20">
-                        <span class="text-slate-500 block text-[10px]">TIME WINDOW</span>
-                        <strong class="text-base font-bold @(secondsRemaining <= 10 ? "text-rose-400 animate-pulse" : "text-white")">
-                            @secondsRemaining s
+                        <span class="text-slate-500 block text-[10px]">TIME PER RUN</span>
+                        <strong class="text-base font-bold text-white">
+                            @(GameState.ActiveGame.ClearanceLevel == ClearanceLevel.Mastermind ? "30s (Hard)" : "45s (Normal)")
                         </strong>
                     </div>
                     <div class="p-2.5 rounded-lg bg-black/60 border border-rose-500/20">
-                        <span class="text-slate-500 block text-[10px]">ERROR PENALTY</span>
-                        <strong class="text-base font-bold text-amber-400">-3s Surge</strong>
+                        <span class="text-slate-500 block text-[10px]">WRONG GUESS PENALTY</span>
+                        <strong class="text-base font-bold text-amber-400">-3s per guess</strong>
                     </div>
                 </div>
 
-                <!-- Simulation Terminal Log Lines -->
-                <div class="p-2.5 rounded-lg bg-black/80 border border-rose-500/20 font-mono text-[10px] text-slate-400 space-y-1">
-                    <div class="flex items-center justify-between text-rose-400/90">
-                        <span>> TARGET: NEO_CENTRAL_VAULT</span>
-                        <span>ENC: REDLINE-256</span>
+                <div class="p-2.5 rounded-lg bg-black/60 border border-rose-500/15 text-[11px] font-mono text-slate-300 space-y-1">
+                    <div class="flex items-center gap-1.5 text-emerald-400">
+                        <i class="fa-solid fa-check text-[10px]"></i>
+                        <span>Green = right digit in right slot</span>
                     </div>
-                    <div class="text-slate-500">> BIO_FIREWALL: PASSCODE HIDDEN</div>
-                    @if (secondsRemaining <= 10 && !GameState.ActiveGame.IsGameOver)
-                    {
-                        <div class="text-rose-400 font-bold animate-pulse">> WARNING: COUNTERMEASURE LOCK IN @secondsRemaining SECONDS!</div>
-                    }
-                    else
-                    {
-                        <div class="text-amber-400/90">> INTRUSION: SURGE PENALTY ACTIVE ON WRONG DIGITS</div>
-                    }
+                    <div class="flex items-center gap-1.5 text-amber-400">
+                        <i class="fa-solid fa-rotate text-[10px]"></i>
+                        <span>Amber = right digit, wrong slot</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-slate-400">
+                        <i class="fa-solid fa-xmark text-[10px]"></i>
+                        <span>Dark = digit not in code</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- AGENT DOSSIER & ENHANCED OOP STATS CARD -->
+            <!-- AGENT DOSSIER & STATS CARD -->
             <div class="glass-card-accent p-4 sm:p-5 space-y-3.5 border-rose-500/25">
                 <div class="flex items-center justify-between border-b border-rose-500/20 pb-3">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 text-base shadow-[0_0_12px_rgba(244,63,94,0.3)]">
+                        <div class="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 text-base">
                             <i class="fa-solid @GameState.CurrentAgent.AvatarIcon"></i>
                         </div>
                         <div>
@@ -363,7 +348,7 @@
                         </div>
                     </div>
 
-                    <!-- Dynamic Clearance Rank Badge (OOP property) -->
+                    <!-- Dynamic Clearance Rank Badge -->
                     <span class="text-[10px] font-mono px-2 py-0.5 rounded border flex items-center gap-1.5 font-bold @GameState.CurrentAgent.RankBadgeColor">
                         <i class="fa-solid @GameState.CurrentAgent.RankIcon"></i>
                         <span>@GameState.CurrentAgent.ClearanceRank</span>
@@ -372,14 +357,14 @@
 
                 <!-- Next Rank Progress Subtext -->
                 <div class="text-[10px] font-mono text-slate-400 flex items-center justify-between px-1">
-                    <span>> RANK TRAJECTORY:</span>
+                    <span>Rank Progress:</span>
                     <span class="text-rose-400 font-bold">@GameState.CurrentAgent.NextRankRequirement</span>
                 </div>
 
                 <!-- 4 Quick Stats -->
                 <div class="grid grid-cols-2 gap-2 font-mono text-center">
                     <div class="p-2 rounded-xl bg-black/60 border border-rose-500/15">
-                        <span class="text-[9px] uppercase text-slate-400 block">Cracked</span>
+                        <span class="text-[9px] uppercase text-slate-400 block">Wins</span>
                         <div class="text-lg font-bold text-emerald-400">@GameState.CurrentAgent.TotalBreaches</div>
                     </div>
 
@@ -392,7 +377,7 @@
                     </div>
 
                     <div class="p-2 rounded-xl bg-black/60 border border-rose-500/15">
-                        <span class="text-[9px] uppercase text-slate-400 block">Streak</span>
+                        <span class="text-[9px] uppercase text-slate-400 block">Win Streak</span>
                         <div class="text-lg font-bold text-rose-400 flex items-center justify-center gap-1">
                             <span>@GameState.CurrentAgent.WinStreak</span>
                             <i class="fa-solid fa-fire text-amber-400 text-xs"></i>
@@ -400,7 +385,7 @@
                     </div>
 
                     <div class="p-2 rounded-xl bg-black/60 border border-rose-500/15">
-                        <span class="text-[9px] uppercase text-slate-400 block">Avg Cycles / Win</span>
+                        <span class="text-[9px] uppercase text-slate-400 block">Avg Attempts / Win</span>
                         <div class="text-lg font-bold text-white">@(GameState.AverageAttemptsPerWin > 0 ? $"{GameState.AverageAttemptsPerWin} cyc" : "-")</div>
                     </div>
                 </div>
@@ -411,7 +396,7 @@
                     <div class="flex items-center gap-1.5">
                         @foreach (var heist in GameState.LastFiveHeists.Reverse())
                         {
-                            <span class="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold border @(heist.Won ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-[0_0_6px_rgba(16,185,129,0.4)]" : "bg-rose-500/20 text-rose-400 border-rose-500/50")"
+                            <span class="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold border @(heist.Won ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50" : "bg-rose-500/20 text-rose-400 border-rose-500/50")"
                                   title="@(heist.Won ? $"Cracked in {heist.AttemptsUsed} cycles (+{heist.Score} pts)" : "Lockout")">
                                 @(heist.Won ? "W" : "L")
                             </span>
@@ -423,16 +408,16 @@
                 <div class="space-y-1.5 pt-1">
                     <div class="flex items-center justify-between text-xs font-mono text-slate-300">
                         <span class="font-bold flex items-center gap-1.5">
-                            <i class="fa-solid fa-clock-rotate-left text-rose-400"></i> RECENT HEISTS
+                            <i class="fa-solid fa-clock-rotate-left text-rose-400"></i> Recent Games
                         </span>
-                        <span class="text-[10px] text-slate-500">HISTORY</span>
+                        <span class="text-[10px] text-slate-500">History</span>
                     </div>
 
                     <div class="space-y-1 max-h-36 overflow-y-auto pr-1">
                         @if (GameState.RecentHeists.Count == 0)
                         {
                             <div class="p-2.5 rounded-lg bg-black/40 text-center text-[10px] text-slate-500 font-mono">
-                                No prior runs. Crack your first vault!
+                                No prior games recorded yet.
                             </div>
                         }
                         else
@@ -453,7 +438,7 @@
                                                 <i class="fa-solid fa-xmark"></i>
                                             </span>
                                         }
-                                        <span class="text-white font-semibold">@(heist.Won ? "Solved" : "Lockout")</span>
+                                        <span class="text-white font-semibold">@(heist.Won ? "Cracked" : "Lockout")</span>
                                         <span class="text-slate-500">[@heist.SecretCode]</span>
                                     </div>
                                     <div class="text-right text-slate-400 flex items-center gap-2">
@@ -461,7 +446,7 @@
                                         {
                                             <span class="text-amber-400 font-bold">+@heist.Score</span>
                                         }
-                                        <span>@heist.AttemptsUsed/6 cyc</span>
+                                        <span>@heist.AttemptsUsed/6 attempts</span>
                                     </div>
                                 </div>
                             }
@@ -473,37 +458,37 @@
         </div>
     </div>
 
-    <!-- HIGH-STAKES GAME OVER MODAL (With Calculated Score Breakdown) -->
+    <!-- GAME OVER MODAL -->
     @if (GameState.ActiveGame.IsGameOver)
     {
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md anim-fade-up">
             <div class="w-full max-w-md glass-card-accent p-6 sm:p-7 text-center space-y-5 border-2 @(GameState.ActiveGame.IsSolved ? "border-emerald-500/70 shadow-[0_0_40px_rgba(16,185,129,0.4)]" : "border-rose-500/70 shadow-[0_0_40px_rgba(244,63,94,0.5)]")">
                 
                 <!-- Status Icon -->
-                <div class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-3xl @(GameState.ActiveGame.IsSolved ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.3)]" : "bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-[0_0_20px_rgba(244,63,94,0.4)]") anim-float">
+                <div class="w-16 h-16 mx-auto rounded-2xl flex items-center justify-center text-3xl @(GameState.ActiveGame.IsSolved ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" : "bg-rose-500/20 text-rose-300 border border-rose-500/40") anim-float">
                     @if (GameState.ActiveGame.IsSolved)
                     {
                         <i class="fa-solid fa-unlock-keyhole"></i>
                     }
                     else
                     {
-                        <i class="fa-solid fa-skull"></i>
+                        <i class="fa-solid fa-lock"></i>
                     }
                 </div>
 
                 <!-- Title & Descriptive Verdict -->
                 <div class="space-y-1.5">
                     <h2 class="text-2xl sm:text-3xl font-extrabold font-display @(GameState.ActiveGame.IsSolved ? "text-emerald-300" : "text-rose-400")">
-                        @(GameState.ActiveGame.IsSolved ? "ACCESS GRANTED" : "SECURITY LOCKOUT")
+                        @(GameState.ActiveGame.IsSolved ? "ACCESS GRANTED" : "LOCKOUT")
                     </h2>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
                         @if (GameState.ActiveGame.IsSolved)
                         {
-                            <span>Outstanding infiltration! Vault breached in <strong>@GameState.ActiveGame.Attempts.Count attempt(s)</strong> with <strong>@secondsRemaining seconds</strong> remaining!</span>
+                            <span>Vault cracked in <strong>@GameState.ActiveGame.Attempts.Count attempt(s)</strong> with <strong>@secondsRemaining seconds</strong> remaining!</span>
                         }
                         else
                         {
-                            <span>Countermeasure timeout triggered! Connection severed before code deduction was achieved.</span>
+                            <span>Time ran out or 6 attempts reached before code deduction was achieved.</span>
                         }
                     </p>
                 </div>
@@ -517,13 +502,13 @@
 
                     <div class="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center justify-between text-xs font-mono">
                         <div class="text-left">
-                            <span class="text-slate-400 block text-[10px]">MISSION SCORE AWARDED</span>
+                            <span class="text-slate-400 block text-[10px]">SCORE AWARDED</span>
                             <strong class="text-xl font-bold text-emerald-300">+@scoreEarned pts</strong>
                         </div>
                         @if (isNewBest)
                         {
-                            <span class="px-2 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold text-[10px] animate-pulse">
-                                <i class="fa-solid fa-trophy mr-1"></i>NEW PERSONAL BEST!
+                            <span class="px-2 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold text-[10px]">
+                                <i class="fa-solid fa-trophy mr-1"></i>New Personal Best
                             </span>
                         }
                     </div>
@@ -537,135 +522,98 @@
                     </div>
                 </div>
 
-                <!-- Flow CTA Buttons: Step 3 -> Step 4 (Recruit) OR Play Again -->
+                <!-- Flow CTA Buttons -->
                 <div class="space-y-2.5">
-                    <!-- Step 4 Next Action -->
                     <a href="signup"
                        class="w-full py-3.5 rounded-xl font-mono text-sm font-bold bg-gradient-to-r from-rose-600 via-red-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-[0_0_20px_rgba(244,63,94,0.45)] transition card-lift flex items-center justify-center gap-2">
                         <i class="fa-solid fa-user-plus"></i>
-                        <span>PROCEED TO STEP 4: RECRUIT DOSSIER</span>
+                        <span>Register Agent Profile</span>
                     </a>
 
-                    <!-- Replay Button -->
                     <button type="button" @onclick="() => StartFreshVault()"
                             class="w-full py-2.5 rounded-xl font-mono text-xs font-semibold bg-white/5 hover:bg-white/10 border border-rose-500/25 text-slate-200 transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-arrows-rotate text-rose-400"></i>
-                        <span>RE-ATTEMPT BREACH (PLAY AGAIN)</span>
+                        <span>Play Again</span>
                     </button>
                 </div>
             </div>
         </div>
     }
 
-    <!-- ════════════════════════════════════════════════════════════════════
-         ONE-TIME MISSION BRIEFING MODAL (First Visit Only, Persisted via localStorage)
-         ════════════════════════════════════════════════════════════════════ -->
+    <!-- ONE-TIME HOW TO PLAY MODAL -->
     @if (showBriefing)
     {
-        <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-lg anim-fade-up">
-            <!-- Ambient glow orb behind modal -->
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-rose-600/10 blur-3xl animate-pulse pointer-events-none"></div>
-
-            <div class="relative w-full max-w-lg glass-card-accent border-2 border-rose-500/50 shadow-[0_0_60px_rgba(244,63,94,0.35)] overflow-hidden">
-
-                <!-- Top scanline accent bar -->
-                <div class="h-1 w-full bg-gradient-to-r from-transparent via-rose-500 to-transparent opacity-80"></div>
-
-                <div class="p-7 sm:p-9 space-y-6">
-                    <!-- Header: Icon + Title -->
-                    <div class="text-center space-y-3">
-                        <div class="w-16 h-16 mx-auto rounded-2xl bg-rose-500/20 border border-rose-500/50 flex items-center justify-center text-rose-400 text-3xl shadow-[0_0_25px_rgba(244,63,94,0.5)] anim-float">
+        <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md anim-fade-up">
+            <div class="relative w-full max-w-lg glass-card-accent border border-rose-500/40 shadow-2xl overflow-hidden">
+                <div class="p-6 sm:p-8 space-y-5">
+                    <!-- Header -->
+                    <div class="text-center space-y-2">
+                        <div class="w-14 h-14 mx-auto rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 text-2xl anim-float">
                             <i class="fa-solid fa-vault"></i>
                         </div>
                         <div>
-                            <span class="text-[10px] font-mono tracking-widest text-rose-400 uppercase">REDLINE // MISSION BRIEFING</span>
-                            <h2 class="text-2xl sm:text-3xl font-extrabold font-display text-white mt-1 leading-tight">
-                                Infiltration Protocol
-                                <br />
-                                <span class="bg-gradient-to-r from-rose-400 to-amber-400 bg-clip-text text-transparent">Authorized</span>
+                            <span class="text-[10px] font-mono tracking-widest text-rose-400 uppercase">Quick Guide</span>
+                            <h2 class="text-2xl font-bold font-display text-white mt-1">
+                                How to Crack the Vault
                             </h2>
                         </div>
                     </div>
 
                     <!-- Instruction Cards: 2x2 Grid -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
-                        <!-- Tile Colors -->
-                        <div class="p-3.5 rounded-xl bg-black/50 border border-rose-500/20 space-y-2.5">
-                            <div class="text-rose-300 font-bold uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
-                                <i class="fa-solid fa-palette"></i> Spectral Feedback
+                        <!-- Colors -->
+                        <div class="p-3 rounded-xl bg-black/50 border border-rose-500/20 space-y-2">
+                            <div class="text-rose-300 font-bold uppercase tracking-wider text-[11px]">
+                                Color Feedback
                             </div>
                             <div class="space-y-1.5 text-slate-300">
                                 <div class="flex items-center gap-2">
-                                    <span class="w-4 h-4 rounded flex-shrink-0 bg-emerald-500/30 border border-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.4)]"></span>
-                                    <span><strong class="text-emerald-400">Emerald</strong> — Correct digit, correct slot</span>
+                                    <span class="w-3.5 h-3.5 rounded flex-shrink-0 bg-emerald-500/30 border border-emerald-400"></span>
+                                    <span><strong class="text-emerald-400">Green</strong>: Right digit, right slot</span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <span class="w-4 h-4 rounded flex-shrink-0 bg-amber-500/30 border border-amber-400 shadow-[0_0_6px_rgba(245,158,11,0.4)]"></span>
-                                    <span><strong class="text-amber-400">Amber</strong> — Digit exists, wrong position</span>
+                                    <span class="w-3.5 h-3.5 rounded flex-shrink-0 bg-amber-500/30 border border-amber-400"></span>
+                                    <span><strong class="text-amber-400">Amber</strong>: In code, wrong slot</span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <span class="w-4 h-4 rounded flex-shrink-0 bg-white/10 border border-white/20"></span>
-                                    <span><strong class="text-slate-400">Slate</strong> — Digit not in passcode</span>
+                                    <span class="w-3.5 h-3.5 rounded flex-shrink-0 bg-white/10 border border-white/20"></span>
+                                    <span><strong class="text-slate-400">Slate</strong>: Not in code</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Core Rules -->
-                        <div class="p-3.5 rounded-xl bg-black/50 border border-rose-500/20 space-y-2.5">
-                            <div class="text-rose-300 font-bold uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
-                                <i class="fa-solid fa-list-check"></i> Mission Rules
+                        <!-- Rules -->
+                        <div class="p-3 rounded-xl bg-black/50 border border-rose-500/20 space-y-2">
+                            <div class="text-rose-300 font-bold uppercase tracking-wider text-[11px]">
+                                Rules
                             </div>
-                            <ul class="space-y-1.5 text-slate-300">
-                                <li class="flex items-start gap-2">
-                                    <i class="fa-solid fa-crosshairs text-rose-400 mt-0.5 flex-shrink-0 text-xs"></i>
-                                    <span><strong class="text-white">6 attempts</strong> to crack the passcode</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i class="fa-solid fa-clock text-amber-400 mt-0.5 flex-shrink-0 text-xs"></i>
-                                    <span><strong class="text-white">30s</strong> trace window (Operative) / <strong class="text-white">20s</strong> (Mastermind)</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i class="fa-solid fa-bolt text-rose-400 mt-0.5 flex-shrink-0 text-xs"></i>
-                                    <span><strong class="text-rose-400">−3 sec penalty</strong> per wrong guess</span>
-                                </li>
+                            <ul class="space-y-1 text-slate-300">
+                                <li>• <strong>6 attempts</strong> to find the passcode</li>
+                                <li>• <strong>45s</strong> timer (Operative) / <strong>30s</strong> (Mastermind)</li>
+                                <li>• <strong class="text-rose-400">-3s penalty</strong> for each wrong guess</li>
                             </ul>
                         </div>
 
                         <!-- Controls -->
-                        <div class="p-3.5 rounded-xl bg-black/50 border border-rose-500/20 space-y-2.5">
-                            <div class="text-rose-300 font-bold uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
-                                <i class="fa-solid fa-keyboard"></i> Controls
+                        <div class="p-3 rounded-xl bg-black/50 border border-rose-500/20 space-y-2">
+                            <div class="text-rose-300 font-bold uppercase tracking-wider text-[11px]">
+                                Controls
                             </div>
-                            <ul class="space-y-1.5 text-slate-300">
-                                <li class="flex items-center gap-2">
-                                    <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white border border-white/25 text-[10px] font-mono">0 – 9</kbd>
-                                    <span>Input a digit</span>
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white border border-white/25 text-[10px] font-mono">Backspace</kbd>
-                                    <span>Delete last digit</span>
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white border border-white/25 text-[10px] font-mono">Enter</kbd>
-                                    <span>Submit guess (↵ EXEC)</span>
-                                </li>
+                            <ul class="space-y-1 text-slate-300">
+                                <li>• Click the on-screen keypad, or type <kbd class="px-1 py-0.5 rounded bg-white/10 text-white text-[10px]">0-9</kbd></li>
+                                <li>• Press <kbd class="px-1 py-0.5 rounded bg-white/10 text-white text-[10px]">Backspace</kbd> to delete</li>
+                                <li>• Press <kbd class="px-1 py-0.5 rounded bg-white/10 text-white text-[10px]">Enter</kbd> to submit</li>
                             </ul>
                         </div>
 
-                        <!-- Win / Lose Outcomes -->
-                        <div class="p-3.5 rounded-xl bg-black/50 border border-rose-500/20 space-y-2.5">
-                            <div class="text-rose-300 font-bold uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
-                                <i class="fa-solid fa-flag-checkered"></i> Outcome
+                        <!-- Goal -->
+                        <div class="p-3 rounded-xl bg-black/50 border border-rose-500/20 space-y-2">
+                            <div class="text-rose-300 font-bold uppercase tracking-wider text-[11px]">
+                                Objective
                             </div>
-                            <ul class="space-y-1.5 text-slate-300">
-                                <li class="flex items-start gap-2">
-                                    <i class="fa-solid fa-unlock-keyhole text-emerald-400 mt-0.5 flex-shrink-0 text-xs"></i>
-                                    <span>Match all digits → <strong class="text-emerald-400">ACCESS GRANTED</strong></span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i class="fa-solid fa-skull text-rose-400 mt-0.5 flex-shrink-0 text-xs"></i>
-                                    <span>Time out or 6 fails → <strong class="text-rose-400">LOCKOUT</strong></span>
-                                </li>
+                            <ul class="space-y-1 text-slate-300">
+                                <li>• Deduce all digits before the timer runs out</li>
+                                <li>• Unused time & attempts give higher scores</li>
                             </ul>
                         </div>
                     </div>
@@ -673,23 +621,16 @@
                     <!-- Pro Tip Banner -->
                     <div class="flex items-start gap-2.5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs font-mono text-amber-300">
                         <i class="fa-solid fa-lightbulb text-amber-400 flex-shrink-0 mt-0.5"></i>
-                        <span>Pro tip: Start with spread digits like <strong class="text-white">1 2 5 8</strong> to maximise first-attempt information gain and narrow down the passcode faster.</span>
+                        <span>Tip: Start with distinct digits like <strong>1 2 5 8</strong> to quickly discover which numbers are in the secret code.</span>
                     </div>
 
-                    <!-- CTA Dismiss Button — writes to localStorage, never shows again -->
+                    <!-- Dismiss Button -->
                     <button type="button" @onclick="DismissBriefing"
-                            class="w-full py-4 rounded-xl font-mono text-sm font-extrabold bg-gradient-to-r from-rose-600 via-red-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-[0_0_30px_rgba(244,63,94,0.5)] transition-all duration-200 card-lift flex items-center justify-center gap-3 tracking-wide">
-                        <i class="fa-solid fa-circle-check text-lg"></i>
-                        <span>ACKNOWLEDGED — INITIATE BREACH</span>
+                            class="w-full py-3.5 rounded-xl font-mono text-sm font-bold bg-gradient-to-r from-rose-600 via-red-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-lg transition-all duration-200 card-lift flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Got It, Start Playing</span>
                     </button>
-
-                    <p class="text-center text-[10px] font-mono text-slate-500 tracking-wide">
-                        This briefing will not appear again after dismissal, Agent <span class="text-rose-400 font-bold">@GameState.CurrentAgent.Codename</span>.
-                    </p>
                 </div>
-
-                <!-- Bottom scanline accent bar -->
-                <div class="h-1 w-full bg-gradient-to-r from-transparent via-rose-500 to-transparent opacity-40"></div>
             </div>
         </div>
     }
@@ -699,14 +640,13 @@
     private string currentInput = "";
     private string statusFeedback = "";
     private int initialTime => GameState.ActiveGame.ClearanceLevel == ClearanceLevel.Mastermind ? 30 : 45;
-    private int secondsRemaining = 30;
+    private int secondsRemaining = 45;
     private int tracePercent => (int)Math.Clamp(Math.Round((1.0 - (double)secondsRemaining / initialTime) * 100), 0, 100);
     private bool audioEnabled = true;
     private bool isShaking = false;
     private bool penaltyFlash = false;
     private CancellationTokenSource? cts;
 
-    // ── Briefing modal: default false so it renders initially hidden (flicker-free) ──
     private bool showBriefing = false;
     private const string BRIEFING_KEY = "vaultcode_briefing_seen";
 
@@ -722,22 +662,17 @@
     {
         if (firstRender)
         {
-            // Check localStorage — only show briefing if the key has never been set
             try
             {
                 var seen = await JS.InvokeAsync<string?>("window.localStorage.getItem", BRIEFING_KEY);
                 if (string.IsNullOrEmpty(seen))
                 {
                     showBriefing = true;
-                    // Pause the timer while briefing is shown
                     cts?.Cancel();
                     StateHasChanged();
                 }
             }
-            catch
-            {
-                // localStorage unavailable (e.g. private mode edge case) — skip briefing
-            }
+            catch { }
         }
     }
 
@@ -745,13 +680,11 @@
     {
         try
         {
-            // Persist to localStorage — will NEVER show again after this point
             await JS.InvokeVoidAsync("window.localStorage.setItem", BRIEFING_KEY, "1");
         }
         catch { }
 
         showBriefing = false;
-        // Restart the timer fresh after the agent acknowledges the briefing
         ResetTimer();
         StateHasChanged();
     }
@@ -784,7 +717,6 @@
             {
                 secondsRemaining--;
 
-                // If in the urgent final 10 seconds, play urgent sonar warning ping!
                 if (secondsRemaining <= 10 && secondsRemaining > 0 && audioEnabled)
                 {
                     _ = JS.InvokeVoidAsync("CyberAudio.playWarningTick");
@@ -794,7 +726,6 @@
             }
             else
             {
-                // Timeout leads to immediate lockout!
                 await InvokeAsync(async () =>
                 {
                     while (!GameState.ActiveGame.IsGameOver)
@@ -893,7 +824,6 @@
             }
             else
             {
-                // INCORRECT GUESS: Apply -3s Time Penalty to make it harder and more urgent!
                 secondsRemaining = Math.Max(1, secondsRemaining - 3);
                 _ = TriggerPenaltyAlert();
             }

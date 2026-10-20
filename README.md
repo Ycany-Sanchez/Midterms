@@ -81,7 +81,7 @@ All domain models reside cleanly under the `VaultCode.Models` namespace in the `
 | `HackerAgent` | Concrete Subclass | `User` &rarr; `HackerAgent` | Inherits from `User`. Adds `Codename`, `ClearanceLevel`, `TotalBreaches`, `WinStreak`, `TotalAttempts`, `AvatarIcon`, `BestScore`, `FewestAttempts`, `ClearanceRank`, `RankIcon`, `RankBadgeColor`, and `NextRankRequirement`. |
 | `VaultGame` | Encapsulated Entity | `IVaultGame` &rarr; `VaultGame` | Implements `IVaultGame`. Encapsulates `_secretCode` (private string). Evaluates two-pass guess deduction logic via `SubmitGuess(string)`. |
 | `CodeAttempt` | Entity Class | `object` &rarr; `CodeAttempt` | Encapsulates a submitted guess (`GuessString`), evaluated results (`List<DigitStatus>`), and a `Timestamp`. |
-| `ClearanceLevel` | Enum | `System.Enum` | Defines clearance tiers: `Operative` (4-digit code // 30s) and `Mastermind` (5-digit code // 20s Hard). |
+| `ClearanceLevel` | Enum | `System.Enum` | Defines clearance tiers: `Operative` (4-digit code // 45s) and `Mastermind` (5-digit code // 30s Hard). |
 | `DigitStatus` | Enum | `System.Enum` | Defines evaluation tokens: `Correct` (Emerald), `Misplaced` (Amber), and `Wrong` (Slate/Muted). |
 
 ---

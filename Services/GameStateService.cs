@@ -19,26 +19,20 @@ public class GameStateService
     {
         FirstName = "Alex",
         LastName = "Mercer",
-        Codename = "ZeroDay_77",
-        Email = "zeroday@cybergrid.net",
+        Codename = "Cipher_99",
+        Email = "agent@vaultcode.net",
         ClearanceLevel = ClearanceLevel.Operative,
-        TotalBreaches = 4,
-        TotalAttempts = 5,
-        WinStreak = 4,
+        TotalBreaches = 0,
+        TotalAttempts = 0,
+        WinStreak = 0,
         AvatarIcon = "fa-user-ninja",
-        BestScore = 1420,
-        FewestAttempts = 3
+        BestScore = 0,
+        FewestAttempts = 0
     };
 
     public IVaultGame ActiveGame { get; private set; }
 
-    public List<HeistRecord> RecentHeists { get; } = new()
-    {
-        new HeistRecord { Timestamp = DateTime.UtcNow.AddMinutes(-24), Clearance = ClearanceLevel.Operative, Won = true, AttemptsUsed = 3, SecretCode = "5091", Score = 1350 },
-        new HeistRecord { Timestamp = DateTime.UtcNow.AddMinutes(-58), Clearance = ClearanceLevel.Operative, Won = true, AttemptsUsed = 4, SecretCode = "8823", Score = 1100 },
-        new HeistRecord { Timestamp = DateTime.UtcNow.AddHours(-3), Clearance = ClearanceLevel.Mastermind, Won = true, AttemptsUsed = 5, SecretCode = "19402", Score = 1420 },
-        new HeistRecord { Timestamp = DateTime.UtcNow.AddHours(-6), Clearance = ClearanceLevel.Mastermind, Won = false, AttemptsUsed = 6, SecretCode = "37180", Score = 0 }
-    };
+    public List<HeistRecord> RecentHeists { get; } = new();
 
     public double AverageAttemptsPerWin => RecentHeists.Where(h => h.Won).Any()
         ? Math.Round(RecentHeists.Where(h => h.Won).Average(h => h.AttemptsUsed), 1)
