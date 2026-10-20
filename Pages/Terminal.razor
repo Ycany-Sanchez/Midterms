@@ -6,8 +6,11 @@
 
 <PageTitle>Vault Terminal — VaultCode Redline Incursion</PageTitle>
 
+<!-- Subtle CRT monitor scanline overlay -->
+<div class="crt-overlay"></div>
+
 <!-- Focusable wrapper to capture physical keyboard strokes, optimized width without excessive side space -->
-<div class="max-w-[1550px] mx-auto px-2 sm:px-4 lg:px-6 py-4 space-y-4 outline-none" tabindex="0" @onkeydown="HandleKeyDown">
+<div class="max-w-[1550px] mx-auto px-2 sm:px-4 lg:px-6 py-4 space-y-4 outline-none relative z-10" tabindex="0" @onkeydown="HandleKeyDown">
     
     <!-- TOP BREACH COMMAND BAR -->
     <header class="glass-card p-3 sm:p-4 relative overflow-hidden transition-all duration-300 @(secondsRemaining <= 10 && !GameState.ActiveGame.IsGameOver ? "anim-danger-pulse border-rose-500/80" : "border-rose-500/20")">
@@ -49,11 +52,11 @@
                 <div class="flex items-center gap-1 bg-black/60 p-1 rounded-xl border border-rose-500/25 text-xs font-mono">
                     <button type="button" @onclick="() => SwitchClearance(ClearanceLevel.Operative)"
                             class="px-2 py-0.5 rounded-lg transition-all @(GameState.ActiveGame.ClearanceLevel == ClearanceLevel.Operative ? "bg-rose-500/25 text-rose-300 border border-rose-400/50 font-bold shadow-[0_0_10px_rgba(244,63,94,0.3)]" : "text-slate-400 hover:text-white")">
-                        Operative (4-Digit // 30s)
+                        Operative (4-Digit // 45s Easy)
                     </button>
                     <button type="button" @onclick="() => SwitchClearance(ClearanceLevel.Mastermind)"
                             class="px-2 py-0.5 rounded-lg transition-all @(GameState.ActiveGame.ClearanceLevel == ClearanceLevel.Mastermind ? "bg-amber-500/25 text-amber-300 border border-amber-400/50 font-bold shadow-[0_0_10px_rgba(245,158,11,0.3)]" : "text-slate-400 hover:text-white")">
-                        Mastermind (5-Digit // 20s Hard)
+                        Mastermind (5-Digit // 30s Hard)
                     </button>
                 </div>
             </div>
@@ -143,13 +146,14 @@
                     </div>
                 </div>
 
-                <!-- 6-ROW VAULT MATRIX (Sleek row indicators, compact heights) -->
+                <!-- 6-ROW VAULT MATRIX (With Wordle-style 3D flip animation!) -->
                 <div class="flex flex-col items-center space-y-2 py-1">
                     @for (int rowIndex = 0; rowIndex < GameState.ActiveGame.MaxAttempts; rowIndex++)
                     {
                         var isEvaluatedRow = rowIndex < GameState.ActiveGame.Attempts.Count;
                         var isActiveRow = rowIndex == GameState.ActiveGame.Attempts.Count && !GameState.ActiveGame.IsGameOver;
                         var attempt = isEvaluatedRow ? GameState.ActiveGame.Attempts[rowIndex] : null;
+                        var isLatestEvaluated = rowIndex == GameState.ActiveGame.Attempts.Count - 1;
 
                         <div class="flex items-center gap-2 sm:gap-3">
                             <!-- Clean Row Number Tag without awkward wrapping -->
@@ -170,8 +174,9 @@
                                         DigitStatus.Misplaced => "tile-misplaced",
                                         _ => "tile-wrong"
                                     };
+                                    var flipClass = isLatestEvaluated ? $"anim-tile-flip delay-{colIndex * 100}" : "";
 
-                                    <div class="tile-base @tileClass font-mono">
+                                    <div class="tile-base @tileClass @flipClass font-mono">
                                         @digitChar
                                     </div>
                                 }
@@ -221,10 +226,10 @@
                     </div>
                 }
 
-                <!-- INTEGRATED QUANTUM KEYPAD (Right underneath matrix, no scrollbar!) -->
-                <div class="pt-2 border-t border-rose-500/20 space-y-2">
+                <!-- INTEGRATED QUANTUM KEYPAD WITH REAL-TIME DIGIT INTEL -->
+                <div class="pt-2 border-t border-rose-500/20 space-y-2.5">
                     <div class="flex items-center justify-between text-[11px] font-mono text-slate-400 px-1">
-                        <span><i class="fa-solid fa-keyboard mr-1.5 text-rose-400"></i>TACTICAL KEYPAD</span>
+                        <span><i class="fa-solid fa-keyboard mr-1.5 text-rose-400"></i>TACTICAL KEYPAD // INTEL ENABLED</span>
                         <span class="text-slate-500">Keyboard entry: [0-9], [Del], [Enter]</span>
                     </div>
 
@@ -232,8 +237,9 @@
                         @for (int num = 1; num <= 9; num++)
                         {
                             var digit = num.ToString()[0];
+                            var intelClass = GetKeypadIntelClass(digit);
                             <button type="button" @onclick="() => InputDigit(digit)" disabled="@GameState.ActiveGame.IsGameOver"
-                                    class="keypad-btn h-11 sm:h-12 rounded-xl bg-black/60 hover:bg-rose-500/15 active:bg-rose-500/30 border border-rose-500/20 hover:border-rose-400/50 text-base sm:text-lg font-bold font-mono text-white flex items-center justify-center card-lift disabled:opacity-40">
+                                    class="keypad-btn h-11 sm:h-12 rounded-xl border text-base sm:text-lg font-bold font-mono flex items-center justify-center card-lift disabled:opacity-40 @intelClass">
                                 @digit
                             </button>
                         }
@@ -246,9 +252,12 @@
                             <span>DEL</span>
                         </button>
 
-                        <!-- Digit 0 -->
+                        <!-- Digit 0 with Intel -->
+                        @{
+                            var zeroIntelClass = GetKeypadIntelClass('0');
+                        }
                         <button type="button" @onclick="() => InputDigit('0')" disabled="@GameState.ActiveGame.IsGameOver"
-                                class="keypad-btn h-11 sm:h-12 rounded-xl bg-black/60 hover:bg-rose-500/15 active:bg-rose-500/30 border border-rose-500/20 hover:border-rose-400/50 text-base sm:text-lg font-bold font-mono text-white flex items-center justify-center card-lift disabled:opacity-40">
+                                class="keypad-btn h-11 sm:h-12 rounded-xl border text-base sm:text-lg font-bold font-mono flex items-center justify-center card-lift disabled:opacity-40 @zeroIntelClass">
                             0
                         </button>
 
@@ -259,6 +268,31 @@
                             <i class="fa-solid fa-arrow-turn-down fa-rotate-90"></i>
                             <span>EXEC</span>
                         </button>
+                    </div>
+
+                    <!-- REAL-TIME DIGIT ELIMINATION TELEMETRY STRIP -->
+                    <div class="p-2 rounded-xl bg-black/60 border border-rose-500/15 flex items-center justify-between text-[10px] font-mono">
+                        <span class="text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <i class="fa-solid fa-microchip text-rose-400"></i> DIGIT INTEL:
+                        </span>
+                        <div class="flex items-center gap-1 sm:gap-1.5">
+                            @for (char d = '0'; d <= '9'; d++)
+                            {
+                                var currentDigit = d;
+                                var intel = GetDigitIntel(currentDigit);
+                                var badgeClass = intel switch
+                                {
+                                    DigitIntelStatus.Correct => "bg-emerald-500/25 text-emerald-300 border-emerald-500/50 font-extrabold",
+                                    DigitIntelStatus.Misplaced => "bg-amber-500/25 text-amber-300 border-amber-500/50 font-extrabold",
+                                    DigitIntelStatus.Eliminated => "bg-white/5 text-slate-600 border-white/5 line-through opacity-40",
+                                    _ => "bg-black/50 text-slate-400 border-white/10"
+                                };
+
+                                <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-md border flex items-center justify-center text-[10px] font-mono @badgeClass">
+                                    @currentDigit
+                                </span>
+                            }
+                        </div>
                     </div>
                 </div>
 
@@ -311,21 +345,35 @@
                 </div>
             </div>
 
-            <!-- AGENT DOSSIER & STATS CARD -->
+            <!-- AGENT DOSSIER & ENHANCED OOP STATS CARD -->
             <div class="glass-card-accent p-4 sm:p-5 space-y-3.5 border-rose-500/25">
-                <div class="flex items-center gap-3 border-b border-rose-500/20 pb-3">
-                    <div class="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 text-base shadow-[0_0_12px_rgba(244,63,94,0.3)]">
-                        <i class="fa-solid @GameState.CurrentAgent.AvatarIcon"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <h3 class="font-display font-bold text-white text-sm sm:text-base">@GameState.CurrentAgent.Codename</h3>
-                            <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40">
-                                @GameState.CurrentAgent.Role
-                            </span>
+                <div class="flex items-center justify-between border-b border-rose-500/20 pb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400 text-base shadow-[0_0_12px_rgba(244,63,94,0.3)]">
+                            <i class="fa-solid @GameState.CurrentAgent.AvatarIcon"></i>
                         </div>
-                        <p class="text-[10px] font-mono text-slate-400">@GameState.CurrentAgent.FullName</p>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-display font-bold text-white text-sm sm:text-base">@GameState.CurrentAgent.Codename</h3>
+                                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                                    @GameState.CurrentAgent.Role
+                                </span>
+                            </div>
+                            <p class="text-[10px] font-mono text-slate-400">@GameState.CurrentAgent.FullName</p>
+                        </div>
                     </div>
+
+                    <!-- Dynamic Clearance Rank Badge (OOP property) -->
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded border flex items-center gap-1.5 font-bold @GameState.CurrentAgent.RankBadgeColor">
+                        <i class="fa-solid @GameState.CurrentAgent.RankIcon"></i>
+                        <span>@GameState.CurrentAgent.ClearanceRank</span>
+                    </span>
+                </div>
+
+                <!-- Next Rank Progress Subtext -->
+                <div class="text-[10px] font-mono text-slate-400 flex items-center justify-between px-1">
+                    <span>> RANK TRAJECTORY:</span>
+                    <span class="text-rose-400 font-bold">@GameState.CurrentAgent.NextRankRequirement</span>
                 </div>
 
                 <!-- 4 Quick Stats -->
@@ -333,6 +381,14 @@
                     <div class="p-2 rounded-xl bg-black/60 border border-rose-500/15">
                         <span class="text-[9px] uppercase text-slate-400 block">Cracked</span>
                         <div class="text-lg font-bold text-emerald-400">@GameState.CurrentAgent.TotalBreaches</div>
+                    </div>
+
+                    <div class="p-2 rounded-xl bg-black/60 border border-rose-500/15">
+                        <span class="text-[9px] uppercase text-slate-400 block">Personal Best</span>
+                        <div class="text-lg font-bold text-amber-400 flex items-center justify-center gap-1">
+                            <span>@GameState.CurrentAgent.BestScore</span>
+                            <span class="text-[10px] text-amber-500 font-normal">pts</span>
+                        </div>
                     </div>
 
                     <div class="p-2 rounded-xl bg-black/60 border border-rose-500/15">
@@ -344,13 +400,22 @@
                     </div>
 
                     <div class="p-2 rounded-xl bg-black/60 border border-rose-500/15">
-                        <span class="text-[9px] uppercase text-slate-400 block">Efficiency</span>
-                        <div class="text-lg font-bold text-amber-400">@GameState.CurrentAgent.SuccessRate%</div>
+                        <span class="text-[9px] uppercase text-slate-400 block">Avg Cycles / Win</span>
+                        <div class="text-lg font-bold text-white">@(GameState.AverageAttemptsPerWin > 0 ? $"{GameState.AverageAttemptsPerWin} cyc" : "-")</div>
                     </div>
+                </div>
 
-                    <div class="p-2 rounded-xl bg-black/60 border border-rose-500/15">
-                        <span class="text-[9px] uppercase text-slate-400 block">Total Runs</span>
-                        <div class="text-lg font-bold text-white">@GameState.CurrentAgent.TotalAttempts</div>
+                <!-- Last 5 Heists Sparkline Strip -->
+                <div class="p-2 rounded-xl bg-black/60 border border-rose-500/15 flex items-center justify-between text-xs font-mono">
+                    <span class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Recent 5 Form:</span>
+                    <div class="flex items-center gap-1.5">
+                        @foreach (var heist in GameState.LastFiveHeists.Reverse())
+                        {
+                            <span class="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold border @(heist.Won ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-[0_0_6px_rgba(16,185,129,0.4)]" : "bg-rose-500/20 text-rose-400 border-rose-500/50")"
+                                  title="@(heist.Won ? $"Cracked in {heist.AttemptsUsed} cycles (+{heist.Score} pts)" : "Lockout")">
+                                @(heist.Won ? "W" : "L")
+                            </span>
+                        }
                     </div>
                 </div>
 
@@ -391,7 +456,11 @@
                                         <span class="text-white font-semibold">@(heist.Won ? "Solved" : "Lockout")</span>
                                         <span class="text-slate-500">[@heist.SecretCode]</span>
                                     </div>
-                                    <div class="text-right text-slate-400">
+                                    <div class="text-right text-slate-400 flex items-center gap-2">
+                                        @if (heist.Won && heist.Score > 0)
+                                        {
+                                            <span class="text-amber-400 font-bold">+@heist.Score</span>
+                                        }
                                         <span>@heist.AttemptsUsed/6 cyc</span>
                                     </div>
                                 </div>
@@ -404,7 +473,7 @@
         </div>
     </div>
 
-    <!-- HIGH-STAKES GAME OVER MODAL (Connecting Step 3 -> Step 4 Recruit) -->
+    <!-- HIGH-STAKES GAME OVER MODAL (With Calculated Score Breakdown) -->
     @if (GameState.ActiveGame.IsGameOver)
     {
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md anim-fade-up">
@@ -438,6 +507,27 @@
                         }
                     </p>
                 </div>
+
+                <!-- Score Award Box (If Won) -->
+                @if (GameState.ActiveGame.IsSolved)
+                {
+                    var latestRecord = GameState.RecentHeists.FirstOrDefault();
+                    var scoreEarned = latestRecord?.Score ?? 0;
+                    var isNewBest = scoreEarned >= GameState.CurrentAgent.BestScore && scoreEarned > 0;
+
+                    <div class="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center justify-between text-xs font-mono">
+                        <div class="text-left">
+                            <span class="text-slate-400 block text-[10px]">MISSION SCORE AWARDED</span>
+                            <strong class="text-xl font-bold text-emerald-300">+@scoreEarned pts</strong>
+                        </div>
+                        @if (isNewBest)
+                        {
+                            <span class="px-2 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold text-[10px] animate-pulse">
+                                <i class="fa-solid fa-trophy mr-1"></i>NEW PERSONAL BEST!
+                            </span>
+                        }
+                    </div>
+                }
 
                 <!-- Passcode Reveal Box -->
                 <div class="p-3 rounded-xl bg-black/80 border border-rose-500/20 space-y-1">
@@ -616,9 +706,11 @@
     private bool penaltyFlash = false;
     private CancellationTokenSource? cts;
 
-    // ── Briefing modal: default true so it renders initially hidden (flicker-free) ──
+    // ── Briefing modal: default false so it renders initially hidden (flicker-free) ──
     private bool showBriefing = false;
     private const string BRIEFING_KEY = "vaultcode_briefing_seen";
+
+    private enum DigitIntelStatus { Untested, Correct, Misplaced, Eliminated }
 
     protected override void OnInitialized()
     {
@@ -708,7 +800,7 @@
                     while (!GameState.ActiveGame.IsGameOver)
                     {
                         var dummyWrong = new string('9', GameState.ActiveGame.CodeLength);
-                        GameState.SubmitActiveGuess(dummyWrong);
+                        GameState.SubmitActiveGuess(dummyWrong, 0);
                     }
                     if (audioEnabled)
                     {
@@ -779,7 +871,7 @@
                 await JS.InvokeVoidAsync("CyberAudio.playSubmit");
             }
 
-            var attempt = GameState.SubmitActiveGuess(currentInput);
+            var attempt = GameState.SubmitActiveGuess(currentInput, secondsRemaining);
             currentInput = "";
             statusFeedback = "";
 
@@ -787,7 +879,7 @@
             {
                 if (audioEnabled)
                 {
-                    await Task.Delay(150);
+                    await Task.Delay(200);
                     await JS.InvokeVoidAsync("CyberAudio.playAccessGranted");
                 }
             }
@@ -795,7 +887,7 @@
             {
                 if (audioEnabled)
                 {
-                    await Task.Delay(150);
+                    await Task.Delay(200);
                     await JS.InvokeVoidAsync("CyberAudio.playLockout");
                 }
             }
@@ -811,6 +903,47 @@
             statusFeedback = ex.Message;
             await TriggerShake();
         }
+    }
+
+    private DigitIntelStatus GetDigitIntel(char digit)
+    {
+        bool isMisplaced = false;
+        bool isTested = false;
+
+        foreach (var attempt in GameState.ActiveGame.Attempts)
+        {
+            for (int i = 0; i < attempt.GuessString.Length; i++)
+            {
+                if (attempt.GuessString[i] == digit)
+                {
+                    isTested = true;
+                    if (attempt.Statuses[i] == DigitStatus.Correct)
+                    {
+                        return DigitIntelStatus.Correct;
+                    }
+                    if (attempt.Statuses[i] == DigitStatus.Misplaced)
+                    {
+                        isMisplaced = true;
+                    }
+                }
+            }
+        }
+
+        if (isMisplaced) return DigitIntelStatus.Misplaced;
+        if (isTested) return DigitIntelStatus.Eliminated;
+        return DigitIntelStatus.Untested;
+    }
+
+    private string GetKeypadIntelClass(char digit)
+    {
+        var intel = GetDigitIntel(digit);
+        return intel switch
+        {
+            DigitIntelStatus.Correct => "bg-emerald-500/25 border-emerald-400 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.35)]",
+            DigitIntelStatus.Misplaced => "bg-amber-500/25 border-amber-400 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.35)]",
+            DigitIntelStatus.Eliminated => "bg-black/90 border-white/5 text-slate-600 line-through opacity-40",
+            _ => "bg-black/60 hover:bg-rose-500/15 active:bg-rose-500/30 border-rose-500/20 hover:border-rose-400/50 text-white"
+        };
     }
 
     private async Task TriggerPenaltyAlert()

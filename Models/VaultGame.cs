@@ -1,6 +1,6 @@
 namespace VaultCode.Models;
 
-public class VaultGame
+public class VaultGame : IVaultGame
 {
     private readonly string _secretCode;
 

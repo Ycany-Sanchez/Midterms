@@ -10,6 +10,7 @@ public class HeistRecord
     public bool Won { get; set; }
     public int AttemptsUsed { get; set; }
     public string SecretCode { get; set; } = string.Empty;
+    public int Score { get; set; } = 0;
 }
 
 public class GameStateService
@@ -24,18 +25,26 @@ public class GameStateService
         TotalBreaches = 4,
         TotalAttempts = 5,
         WinStreak = 4,
-        AvatarIcon = "fa-user-ninja"
+        AvatarIcon = "fa-user-ninja",
+        BestScore = 1420,
+        FewestAttempts = 3
     };
 
-    public VaultGame ActiveGame { get; private set; }
+    public IVaultGame ActiveGame { get; private set; }
 
     public List<HeistRecord> RecentHeists { get; } = new()
     {
-        new HeistRecord { Timestamp = DateTime.UtcNow.AddMinutes(-24), Clearance = ClearanceLevel.Operative, Won = true, AttemptsUsed = 3, SecretCode = "5091" },
-        new HeistRecord { Timestamp = DateTime.UtcNow.AddMinutes(-58), Clearance = ClearanceLevel.Operative, Won = true, AttemptsUsed = 4, SecretCode = "8823" },
-        new HeistRecord { Timestamp = DateTime.UtcNow.AddHours(-3), Clearance = ClearanceLevel.Mastermind, Won = true, AttemptsUsed = 5, SecretCode = "19402" },
-        new HeistRecord { Timestamp = DateTime.UtcNow.AddHours(-6), Clearance = ClearanceLevel.Mastermind, Won = false, AttemptsUsed = 6, SecretCode = "37180" }
+        new HeistRecord { Timestamp = DateTime.UtcNow.AddMinutes(-24), Clearance = ClearanceLevel.Operative, Won = true, AttemptsUsed = 3, SecretCode = "5091", Score = 1350 },
+        new HeistRecord { Timestamp = DateTime.UtcNow.AddMinutes(-58), Clearance = ClearanceLevel.Operative, Won = true, AttemptsUsed = 4, SecretCode = "8823", Score = 1100 },
+        new HeistRecord { Timestamp = DateTime.UtcNow.AddHours(-3), Clearance = ClearanceLevel.Mastermind, Won = true, AttemptsUsed = 5, SecretCode = "19402", Score = 1420 },
+        new HeistRecord { Timestamp = DateTime.UtcNow.AddHours(-6), Clearance = ClearanceLevel.Mastermind, Won = false, AttemptsUsed = 6, SecretCode = "37180", Score = 0 }
     };
+
+    public double AverageAttemptsPerWin => RecentHeists.Where(h => h.Won).Any()
+        ? Math.Round(RecentHeists.Where(h => h.Won).Average(h => h.AttemptsUsed), 1)
+        : 0.0;
+
+    public IEnumerable<HeistRecord> LastFiveHeists => RecentHeists.Take(5);
 
     public event Action? OnChange;
 
@@ -51,17 +60,34 @@ public class GameStateService
         NotifyStateChanged();
     }
 
-    public CodeAttempt SubmitActiveGuess(string guess)
+    public CodeAttempt SubmitActiveGuess(string guess, int secondsRemaining = 0)
     {
         var attempt = ActiveGame.SubmitGuess(guess);
 
         if (ActiveGame.IsGameOver)
         {
             CurrentAgent.TotalAttempts++;
+            int runScore = 0;
+
             if (ActiveGame.IsSolved)
             {
                 CurrentAgent.TotalBreaches++;
                 CurrentAgent.WinStreak++;
+
+                // Score formula: (unused attempts bonus) + (time remaining bonus) + clearance difficulty multiplier
+                int unusedAttempts = ActiveGame.MaxAttempts - ActiveGame.Attempts.Count;
+                int difficultyBonus = ActiveGame.ClearanceLevel == ClearanceLevel.Mastermind ? 500 : 250;
+                runScore = difficultyBonus + (unusedAttempts * 200) + (secondsRemaining * 30);
+
+                if (runScore > CurrentAgent.BestScore)
+                {
+                    CurrentAgent.BestScore = runScore;
+                }
+
+                if (CurrentAgent.FewestAttempts == 0 || ActiveGame.Attempts.Count < CurrentAgent.FewestAttempts)
+                {
+                    CurrentAgent.FewestAttempts = ActiveGame.Attempts.Count;
+                }
             }
             else
             {
@@ -73,7 +99,8 @@ public class GameStateService
                 Clearance = ActiveGame.ClearanceLevel,
                 Won = ActiveGame.IsSolved,
                 AttemptsUsed = ActiveGame.Attempts.Count,
-                SecretCode = ActiveGame.RevealedCode
+                SecretCode = ActiveGame.RevealedCode,
+                Score = runScore
             });
         }
 
