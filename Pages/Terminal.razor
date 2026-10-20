@@ -466,12 +466,149 @@
             </div>
         </div>
     }
+
+    <!-- ════════════════════════════════════════════════════════════════════
+         ONE-TIME MISSION BRIEFING MODAL (First Visit Only, Persisted via localStorage)
+         ════════════════════════════════════════════════════════════════════ -->
+    @if (showBriefing)
+    {
+        <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-lg anim-fade-up">
+            <!-- Ambient glow orb behind modal -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-rose-600/10 blur-3xl animate-pulse pointer-events-none"></div>
+
+            <div class="relative w-full max-w-lg glass-card-accent border-2 border-rose-500/50 shadow-[0_0_60px_rgba(244,63,94,0.35)] overflow-hidden">
+
+                <!-- Top scanline accent bar -->
+                <div class="h-1 w-full bg-gradient-to-r from-transparent via-rose-500 to-transparent opacity-80"></div>
+
+                <div class="p-7 sm:p-9 space-y-6">
+                    <!-- Header: Icon + Title -->
+                    <div class="text-center space-y-3">
+                        <div class="w-16 h-16 mx-auto rounded-2xl bg-rose-500/20 border border-rose-500/50 flex items-center justify-center text-rose-400 text-3xl shadow-[0_0_25px_rgba(244,63,94,0.5)] anim-float">
+                            <i class="fa-solid fa-vault"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-mono tracking-widest text-rose-400 uppercase">REDLINE // MISSION BRIEFING</span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold font-display text-white mt-1 leading-tight">
+                                Infiltration Protocol
+                                <br />
+                                <span class="bg-gradient-to-r from-rose-400 to-amber-400 bg-clip-text text-transparent">Authorized</span>
+                            </h2>
+                        </div>
+                    </div>
+
+                    <!-- Instruction Cards: 2x2 Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+                        <!-- Tile Colors -->
+                        <div class="p-3.5 rounded-xl bg-black/50 border border-rose-500/20 space-y-2.5">
+                            <div class="text-rose-300 font-bold uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
+                                <i class="fa-solid fa-palette"></i> Spectral Feedback
+                            </div>
+                            <div class="space-y-1.5 text-slate-300">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-4 h-4 rounded flex-shrink-0 bg-emerald-500/30 border border-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.4)]"></span>
+                                    <span><strong class="text-emerald-400">Emerald</strong> — Correct digit, correct slot</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-4 h-4 rounded flex-shrink-0 bg-amber-500/30 border border-amber-400 shadow-[0_0_6px_rgba(245,158,11,0.4)]"></span>
+                                    <span><strong class="text-amber-400">Amber</strong> — Digit exists, wrong position</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-4 h-4 rounded flex-shrink-0 bg-white/10 border border-white/20"></span>
+                                    <span><strong class="text-slate-400">Slate</strong> — Digit not in passcode</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Core Rules -->
+                        <div class="p-3.5 rounded-xl bg-black/50 border border-rose-500/20 space-y-2.5">
+                            <div class="text-rose-300 font-bold uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
+                                <i class="fa-solid fa-list-check"></i> Mission Rules
+                            </div>
+                            <ul class="space-y-1.5 text-slate-300">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-crosshairs text-rose-400 mt-0.5 flex-shrink-0 text-xs"></i>
+                                    <span><strong class="text-white">6 attempts</strong> to crack the passcode</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-clock text-amber-400 mt-0.5 flex-shrink-0 text-xs"></i>
+                                    <span><strong class="text-white">30s</strong> trace window (Operative) / <strong class="text-white">20s</strong> (Mastermind)</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-bolt text-rose-400 mt-0.5 flex-shrink-0 text-xs"></i>
+                                    <span><strong class="text-rose-400">−3 sec penalty</strong> per wrong guess</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Controls -->
+                        <div class="p-3.5 rounded-xl bg-black/50 border border-rose-500/20 space-y-2.5">
+                            <div class="text-rose-300 font-bold uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
+                                <i class="fa-solid fa-keyboard"></i> Controls
+                            </div>
+                            <ul class="space-y-1.5 text-slate-300">
+                                <li class="flex items-center gap-2">
+                                    <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white border border-white/25 text-[10px] font-mono">0 – 9</kbd>
+                                    <span>Input a digit</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white border border-white/25 text-[10px] font-mono">Backspace</kbd>
+                                    <span>Delete last digit</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white border border-white/25 text-[10px] font-mono">Enter</kbd>
+                                    <span>Submit guess (↵ EXEC)</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Win / Lose Outcomes -->
+                        <div class="p-3.5 rounded-xl bg-black/50 border border-rose-500/20 space-y-2.5">
+                            <div class="text-rose-300 font-bold uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
+                                <i class="fa-solid fa-flag-checkered"></i> Outcome
+                            </div>
+                            <ul class="space-y-1.5 text-slate-300">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-unlock-keyhole text-emerald-400 mt-0.5 flex-shrink-0 text-xs"></i>
+                                    <span>Match all digits → <strong class="text-emerald-400">ACCESS GRANTED</strong></span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-skull text-rose-400 mt-0.5 flex-shrink-0 text-xs"></i>
+                                    <span>Time out or 6 fails → <strong class="text-rose-400">LOCKOUT</strong></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Pro Tip Banner -->
+                    <div class="flex items-start gap-2.5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-xs font-mono text-amber-300">
+                        <i class="fa-solid fa-lightbulb text-amber-400 flex-shrink-0 mt-0.5"></i>
+                        <span>Pro tip: Start with spread digits like <strong class="text-white">1 2 5 8</strong> to maximise first-attempt information gain and narrow down the passcode faster.</span>
+                    </div>
+
+                    <!-- CTA Dismiss Button — writes to localStorage, never shows again -->
+                    <button type="button" @onclick="DismissBriefing"
+                            class="w-full py-4 rounded-xl font-mono text-sm font-extrabold bg-gradient-to-r from-rose-600 via-red-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-[0_0_30px_rgba(244,63,94,0.5)] transition-all duration-200 card-lift flex items-center justify-center gap-3 tracking-wide">
+                        <i class="fa-solid fa-circle-check text-lg"></i>
+                        <span>ACKNOWLEDGED — INITIATE BREACH</span>
+                    </button>
+
+                    <p class="text-center text-[10px] font-mono text-slate-500 tracking-wide">
+                        This briefing will not appear again after dismissal, Agent <span class="text-rose-400 font-bold">@GameState.CurrentAgent.Codename</span>.
+                    </p>
+                </div>
+
+                <!-- Bottom scanline accent bar -->
+                <div class="h-1 w-full bg-gradient-to-r from-transparent via-rose-500 to-transparent opacity-40"></div>
+            </div>
+        </div>
+    }
 </div>
 
 @code {
     private string currentInput = "";
     private string statusFeedback = "";
-    private int initialTime => GameState.ActiveGame.ClearanceLevel == ClearanceLevel.Mastermind ? 20 : 30;
+    private int initialTime => GameState.ActiveGame.ClearanceLevel == ClearanceLevel.Mastermind ? 30 : 45;
     private int secondsRemaining = 30;
     private int tracePercent => (int)Math.Clamp(Math.Round((1.0 - (double)secondsRemaining / initialTime) * 100), 0, 100);
     private bool audioEnabled = true;
@@ -479,10 +616,52 @@
     private bool penaltyFlash = false;
     private CancellationTokenSource? cts;
 
+    // ── Briefing modal: default true so it renders initially hidden (flicker-free) ──
+    private bool showBriefing = false;
+    private const string BRIEFING_KEY = "vaultcode_briefing_seen";
+
     protected override void OnInitialized()
     {
         GameState.OnChange += HandleGameStateChange;
         ResetTimer();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Check localStorage — only show briefing if the key has never been set
+            try
+            {
+                var seen = await JS.InvokeAsync<string?>("window.localStorage.getItem", BRIEFING_KEY);
+                if (string.IsNullOrEmpty(seen))
+                {
+                    showBriefing = true;
+                    // Pause the timer while briefing is shown
+                    cts?.Cancel();
+                    StateHasChanged();
+                }
+            }
+            catch
+            {
+                // localStorage unavailable (e.g. private mode edge case) — skip briefing
+            }
+        }
+    }
+
+    private async Task DismissBriefing()
+    {
+        try
+        {
+            // Persist to localStorage — will NEVER show again after this point
+            await JS.InvokeVoidAsync("window.localStorage.setItem", BRIEFING_KEY, "1");
+        }
+        catch { }
+
+        showBriefing = false;
+        // Restart the timer fresh after the agent acknowledges the briefing
+        ResetTimer();
+        StateHasChanged();
     }
 
     private void HandleGameStateChange()
